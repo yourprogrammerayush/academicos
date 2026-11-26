@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/restore-assets.mjs && next build",
+    "build": "npm run assets && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "node scripts/restore-assets.mjs"
+    "postinstall": "npm run assets",
+    "assets": "node scripts/restore-assets.mjs && node scripts/copy-pdf-worker.mjs"
   },
   "dependencies": {
     "katex": "^0.16.22",
