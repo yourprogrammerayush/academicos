@@ -32,7 +32,6 @@ export default function VideoPage() {
   const [speed, setSpeed] = useState(1);
   const [wide, setWide] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [showChrome, setShowChrome] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const current = videos[index];
@@ -99,10 +98,7 @@ export default function VideoPage() {
             <div className="min-w-0 flex-1">
               <div
                 className={`relative mx-auto overflow-hidden bg-[#080D16] ${wide ? 'aspect-video max-h-[70vh] w-full rounded-none sm:rounded-xl' : 'aspect-[9/16] max-h-[78vh] w-full max-w-[420px] rounded-none sm:rounded-xl'}`}
-                onClick={() => {
-                  togglePlay();
-                  setShowChrome(true);
-                }}
+                onClick={togglePlay}
               >
                 <video
                   key={current.id}
@@ -198,7 +194,6 @@ export default function VideoPage() {
                     <ChevronDown size={16} />
                   </IconBtn>
                 </div>
-                {void showChrome}
               </div>
             </div>
 

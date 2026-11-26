@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Sun,
   Moon,
@@ -23,23 +23,28 @@ import type { Collection } from '@/lib/types';
 export default function SettingsPage() {
   const { theme, setTheme, signedIn, userName, setAuthOpen, signOut, installPrompt, canInstall, driveConnected, catalog } = useApp();
   const [cleared, setCleared] = useState(false);
+  const [collectionCount, setCollectionCount] = useState(0);
+  const [standalone, setStandalone] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem('academicos:collections') || '[]') as Collection[];
+      setCollectionCount(Array.isArray(raw) ? raw.length : 0);
+    } catch {
+      setCollectionCount(0);
+    }
+    setStandalone(window.matchMedia('(display-mode: standalone)').matches);
+  }, []);
 
   const clearLocal = () => {
     if (!confirm('Clear favorites, collections, recents and search history on this device?')) return;
     ['favorites', 'collections', 'recents', 'downloads', 'searchHistory', 'progress'].forEach((k) =>
       localStorage.removeItem(`academicos:${k}`)
     );
+    setCollectionCount(0);
     setCleared(true);
     setTimeout(() => setCleared(false), 2000);
   };
-
-  const collections = ((): Collection[] => {
-    try {
-      return JSON.parse(localStorage.getItem('academicos:collections') || '[]') as Collection[];
-    } catch {
-      return [];
-    }
-  })();
 
   return (
     <>
@@ -113,7 +118,7 @@ export default function SettingsPage() {
               <button onClick={installPrompt} className="btn btn-primary text-[12px]"><Download size={13} /> Install</button>
             ) : (
               <span className="rounded-md border border-[var(--line)] px-2 py-1 text-[10.5px] text-[var(--fg-subtle)]">
-                {typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches ? 'Already installed' : 'Use browser menu → Install'}
+                {standalone ? 'Already installed' : 'Use browser menu → Install'}
               </span>
             )}
           </div>
@@ -132,7 +137,7 @@ export default function SettingsPage() {
               <Trash2 size={14} className="text-[var(--warn)]" />
               <span className="flex-1">
                 <span className="block text-[12.5px] font-medium">{cleared ? 'Cleared' : 'Clear local workspace data'}</span>
-                <span className="block text-[11px] text-[var(--fg-subtle)]">{collections.length} collections · resets favorites and history</span>
+                <span className="block text-[11px] text-[var(--fg-subtle)]">{collectionCount} collections · resets favorites and history</span>
               </span>
               {cleared && <Check size={14} className="text-[var(--ok)]" />}
             </button>

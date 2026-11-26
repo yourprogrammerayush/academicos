@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Library, Sparkle, Search } from 'lucide-react';
+import { Home, Library, Sparkle, Search, Bookmark } from 'lucide-react';
 import { useApp } from './app-provider';
 
 const ITEMS = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/library', label: 'Library', icon: Library },
   { href: '/ai', label: 'AI', icon: Sparkle },
-  { href: '/workspace', label: 'Saved', icon: Search },
+  { href: '/workspace', label: 'Saved', icon: Bookmark },
 ];
 
 export function MobileNav() {

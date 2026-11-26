@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
   ChevronRight,
@@ -279,7 +280,7 @@ function FilterGroup({ label, options, value, onChange }: { label: string; optio
 
 function FileRow({ file, last }: { file: CatalogFile; last: boolean }) {
   return (
-    <a
+    <Link
       href={`/viewer/${file.id}`}
       className={`group flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-[var(--bg-hover)] ${!last ? 'border-b border-[var(--line)]' : ''}`}
     >
@@ -292,7 +293,7 @@ function FileRow({ file, last }: { file: CatalogFile; last: boolean }) {
       </div>
       <span className="hidden shrink-0 text-[11px] text-[var(--fg-subtle)] sm:block">{formatSize(file.size)}</span>
       <span className="shrink-0 rounded border border-[var(--line)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--fg-muted)]">{file.type}</span>
-    </a>
+    </Link>
   );
 }
 

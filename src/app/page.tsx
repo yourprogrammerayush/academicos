@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -61,10 +61,14 @@ export default function HomePage() {
   }, [files]);
 
   const featured = useMemo(() => files.filter((f) => f.type === 'Notes' || f.type === 'Syllabus').slice(0, 3), [files]);
-  const continueList = useMemo(() => {
-    const recents = store.getRecents().slice(0, 6);
-    return recents.map((r) => files.find((f) => f.id === r.id)).filter(Boolean) as CatalogFile[];
-  }, [files]);
+  const [recentIds, setRecentIds] = useState<string[]>([]);
+  useEffect(() => {
+    setRecentIds(store.getRecents().slice(0, 6).map((r) => r.id));
+  }, []);
+  const continueList = useMemo(
+    () => recentIds.map((id) => files.find((f) => f.id === id)).filter(Boolean) as CatalogFile[],
+    [files, recentIds]
+  );
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
