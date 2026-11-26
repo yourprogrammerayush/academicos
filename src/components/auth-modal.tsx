@@ -7,6 +7,8 @@ import { useApp } from './app-provider';
 
 type Mode = 'signin' | 'signup' | 'otp';
 
+const HAS_CLERK = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
 export function AuthModal() {
   const { authOpen, setAuthOpen, signIn, signedIn, userName, signOut } = useApp();
   const [mode, setMode] = useState<Mode>('signin');
@@ -114,11 +116,12 @@ export function AuthModal() {
             <button
               onClick={() => {
                 setLoading(true);
+                const name = email.trim() ? email.split('@')[0] : 'Student';
                 setTimeout(() => {
                   setLoading(false);
-                  signIn('Ayush Jha', 'ayush@example.com');
+                  signIn(name, email.trim() || 'local@academicos.app');
                   setAuthOpen(false);
-                }, 800);
+                }, 700);
               }}
               className="btn btn-ghost mt-5 w-full justify-center gap-2.5 py-2.5"
             >
@@ -128,8 +131,13 @@ export function AuthModal() {
                 <path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84Z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38Z" />
               </svg>
-              Continue with Google
+              {HAS_CLERK ? 'Continue with Google' : 'Create local profile'}
             </button>
+            <p className="mt-2 text-center text-[10px] leading-relaxed text-[var(--fg-subtle)]">
+              {HAS_CLERK
+                ? 'Secured by Clerk · Google one-tap'
+                : 'Stored on this device only. Add Clerk keys to enable Google one-tap sync.'}
+            </p>
 
             <div className="my-4 flex items-center gap-3">
               <span className="h-px flex-1 bg-[var(--line)]" />
