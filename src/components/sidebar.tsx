@@ -34,7 +34,7 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { setPaletteOpen, theme, setTheme, signedIn, userName, setAuthOpen } = useApp();
+  const { setPaletteOpen, theme, setTheme, signedIn, userName, setAuthOpen, fileById } = useApp();
   const [collapsed, setCollapsed] = useState(false);
   const [recents, setRecents] = useState<{ id: string; label: string }[]>([]);
 
@@ -44,8 +44,9 @@ export function Sidebar() {
       store
         .getRecents()
         .slice(0, 4)
-        .map((r) => ({ id: r.id, label: r.id }))
+        .map((r) => ({ id: r.id, label: fileById(r.id)?.name || 'Recent file' }))
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleCollapsed = () => {
@@ -140,7 +141,7 @@ export function Sidebar() {
                 className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[12.5px] text-[var(--fg-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
               >
                 <span className="h-1 w-1 rounded-full bg-[var(--fg-subtle)]" />
-                <span className="truncate">{r.label.replace(/demo-/, '').replace(/-/g, ' ')}</span>
+                <span className="truncate" title={r.label}>{r.label}</span>
               </Link>
             ))}
           </div>

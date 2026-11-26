@@ -77,6 +77,8 @@ export default function ViewerPage() {
     }
   }, [file]);
 
+  const isText = file?.kind === 'text';
+
   useEffect(() => {
     if (!file) return;
     const onKey = (e: KeyboardEvent) => {
@@ -127,6 +129,11 @@ export default function ViewerPage() {
     }
   }, [file, textLoading, textContent]);
 
+  useEffect(() => {
+    if (isText && file) void loadText();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isText, file?.id]);
+
   const related = useMemo(() => {
     if (!file) return [];
     return catalog.files
@@ -151,15 +158,14 @@ export default function ViewerPage() {
     );
   }
 
+
+
   const src = `/api/drive?id=${encodeURIComponent(file.id)}`;
   const isPdf = file.kind === 'pdf';
   const isVideo = file.kind === 'video';
   const isAudio = file.kind === 'audio';
   const isImage = file.kind === 'image';
-  const isText = file.kind === 'text';
   const isDoc = file.kind === 'doc' || file.kind === 'other';
-
-  if (isText) void loadText();
 
   return (
     <div className={`flex flex-col bg-[var(--bg)] ${fullscreen ? 'fixed inset-0 z-[70] h-screen' : 'h-screen md:h-screen'}`}>
