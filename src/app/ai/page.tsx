@@ -13,6 +13,7 @@ import {
   Trash2,
   Menu,
   X,
+  ArrowLeft,
   BookOpen,
   Languages,
   Zap,
@@ -271,6 +272,9 @@ export default function AIPage() {
             <button onClick={() => setSidebarOpen(true)} aria-label="Open conversations" className="rounded-md p-1.5 text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] md:hidden">
               <Menu size={16} />
             </button>
+            <Link href="/library" aria-label="Back to library" className="rounded-md p-1.5 text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] md:hidden">
+              <ArrowLeft size={16} />
+            </Link>
             <div className="flex min-w-0 items-center gap-2">
               <Sparkle size={15} className="shrink-0 text-[var(--brand)]" />
               <p className="truncate text-[13px] font-medium">Study AI</p>
