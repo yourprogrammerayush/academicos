@@ -15,7 +15,6 @@ import {
   Play,
   FileText,
   GraduationCap,
-  FolderOpen,
   Command,
   Flame,
 } from 'lucide-react';
@@ -167,7 +166,7 @@ export default function HomePage() {
             icon={Sparkle}
             tone="accent"
           />
-          <QuickTile href="/library" label="Browse library" meta={`${stats.subjects} subjects`} icon={FolderOpen} />
+          <QuickTile href="/exams" label="Exam kits" meta="Revision order" icon={GraduationCap} />
           <QuickTile href="/video" label="Video lectures" meta={`${stats.videos} clips`} icon={Film} />
           <QuickTile href="/audio" label="Podcasts" meta={`${stats.audio} tracks`} icon={Headphones} />
         </section>

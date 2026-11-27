@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   ArrowUp,
   Bookmark,
@@ -41,8 +42,10 @@ function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-export default function AIPage() {
-  const { catalog, fileById } = useApp();
+function AIInner() {
+  const { catalog } = useApp();
+  const params = useSearchParams();
+  const presetAsk = params.get('ask');
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [activeId, setActiveId] = useState<string>('');
   const [input, setInput] = useState('');
@@ -71,6 +74,14 @@ export default function AIPage() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [active?.messages, streamText]);
+
+  // A link like /ai?ask=… seeds the composer and sends it straight away.
+  const seeded = useRef(false);
+  useEffect(() => {
+    if (!presetAsk || seeded.current || !active) return;
+    seeded.current = true;
+    setInput(presetAsk);
+  }, [presetAsk, active]);
 
   const persist = useCallback((next: ChatThread[]) => {
     setThreads(next);
@@ -516,5 +527,21 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AIPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-[100dvh] items-center justify-center md:h-screen">
+          <div className="flex items-center gap-2 text-[12.5px] text-faint">
+            <Sparkle size={14} className="text-accent" /> Loading Study AI…
+          </div>
+        </div>
+      }
+    >
+      <AIInner />
+    </Suspense>
   );
 }

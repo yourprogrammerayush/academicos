@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   Home,
+  GraduationCap,
   Library,
   Sparkle,
   Film,
@@ -27,6 +28,7 @@ import { Logo } from './logo';
 const NAV = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/library', label: 'Library', icon: Library },
+  { href: '/exams', label: 'Exam kits', icon: GraduationCap },
   { href: '/ai', label: 'Study AI', icon: Sparkle },
   { href: '/video', label: 'Video', icon: Film },
   { href: '/audio', label: 'Podcasts', icon: Headphones },

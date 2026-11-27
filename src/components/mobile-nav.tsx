@@ -14,6 +14,7 @@ import {
   X,
   LayoutGrid,
   ChevronLeft,
+  GraduationCap,
 } from 'lucide-react';
 import { useApp } from './app-provider';
 import { Logo } from './logo';
@@ -65,6 +66,7 @@ const PRIMARY = [
 ];
 
 const SHEET = [
+  { href: '/exams', label: 'Exam kits', desc: 'Revision order per subject', icon: GraduationCap },
   { href: '/video', label: 'Video lectures', desc: 'Reels-style lecture feed', icon: Film },
   { href: '/audio', label: 'Podcasts', desc: 'Listen to lecture audio', icon: Headphones },
 ];

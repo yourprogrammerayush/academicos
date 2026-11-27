@@ -14,6 +14,7 @@ import {
   Sun,
   Moon,
   ArrowUpRight,
+  GraduationCap,
 } from 'lucide-react';
 import { useApp } from './app-provider';
 import { searchCatalog } from '@/lib/search';
@@ -50,6 +51,7 @@ export function CommandPalette() {
       { id: 'nav-home', label: 'Go to Home', icon: <Home size={15} />, action: () => router.push('/') },
       { id: 'nav-lib', label: 'Go to Library', icon: <Library size={15} />, action: () => router.push('/library') },
       { id: 'nav-ai', label: 'Open Study AI', icon: <Sparkle size={15} />, action: () => router.push('/ai') },
+      { id: 'nav-exams', label: 'Open Exam kits', icon: <GraduationCap size={15} />, action: () => router.push('/exams') },
       { id: 'nav-video', label: 'Open Video', icon: <Film size={15} />, action: () => router.push('/video') },
       { id: 'nav-audio', label: 'Open Podcasts', icon: <Headphones size={15} />, action: () => router.push('/audio') },
       { id: 'nav-ws', label: 'Open Workspace', icon: <Bookmark size={15} />, action: () => router.push('/workspace') },
