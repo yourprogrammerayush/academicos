@@ -4,18 +4,20 @@ export const SUBJECT_SYNONYMS: Record<string, string[]> = {
   COA: ['computer organization', 'computer organisation', 'coa', 'computer architecture'],
   DCN: ['data communication', 'dcn', 'data communication network'],
   DECO: ['digital electronics', 'deco', 'digital electronics and computer organization'],
-  OOP: ['oop', 'object oriented', 'object-oriented', 'java', 'cpp'],
+  OOP: ['oop', 'oops', 'object oriented', 'object-oriented', 'java', 'cpp'],
   DSA: ['dsa', 'data structure', 'data structures'],
   DBMS: ['dbms', 'database', 'database management'],
   OS: ['operating system', 'operating systems'],
   CN: ['computer network', 'computer networks', 'cn'],
   DM: ['discrete math', 'discrete mathematics', 'discrete', 'dm'],
-  AI: ['artificial intelligence', 'gen ai', 'generative ai', 'llm'],
+  AI: ['artificial intelligence', 'gen ai', 'generative ai', 'llm', 'ai'],
   DVA: ['data visualization', 'data analytics', 'dva', 'data visualisation'],
   SE: ['software engineering'],
   CC: ['cloud computing'],
   DEAI: ['data engineering'],
   ET: ['emerging technolog'],
+  CCS: ['ccs', 'communication skills', 'communication skill'],
+  NPTEL: ['nptel'],
   LTA: ['lta'],
   PALB: ['palb'],
   DMW: ['dmw'],
@@ -49,6 +51,8 @@ const SUBJECT_CANONICAL: Record<string, string> = {
   DMW: 'DMW',
   EVS: 'Environmental Studies',
   PPS: 'Programming for Problem Solving',
+  CCS: 'Communication Skills',
+  NPTEL: 'NPTEL Certification',
 };
 
 export function kindFromMime(mime: string, name: string): FileKind {
@@ -116,6 +120,8 @@ const GENERIC =
   /^(SEM\s*\d|SEMESTER|ACADEMIC CALENDAR|ASSESSMENT|NOTICES|STUDENT HANDBOOK|VIDEO GUIDES|AUDIO GUIDES|COURSES|PYQS?|QUESTION BANKS?|DATESHEET|TIMETABLE|GUIDES|NPTEL|EXAM MATERIALS|UNIVERSITY NOTES|OTHERS|ALL SYLLABUS|IILM LOGO PNGs)/i;
 
 const SUBJECT_ORDER = [
+  'CCS',
+  'NPTEL',
   'DEAI', 'DECO', 'DBMS', 'PALB', 'PPS', 'DVA', 'DMW', 'LTA', 'EVS', 'SE', 'CC', 'TOC',
   'COA', 'DCN', 'DSA', 'OOP', 'DM', 'ET', 'AI', 'ML', 'OS', 'CN',
 ];
@@ -129,7 +135,8 @@ function matchSubject(hayRaw: string): string | undefined {
       const needle = s.toUpperCase();
       if (needle.length <= 3) {
         const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        if (new RegExp(`(^|[^A-Z])${escaped}([^A-Z]|$)`).test(hay)) return SUBJECT_CANONICAL[code] || code;
+        if (new RegExp(`(^|[^A-Z])${escaped}(S|ES)?([^A-Z]|$)`).test(hay))
+          return SUBJECT_CANONICAL[code] || code;
       } else if (hay.includes(needle)) {
         return SUBJECT_CANONICAL[code] || code;
       }

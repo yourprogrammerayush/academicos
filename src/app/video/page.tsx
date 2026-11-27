@@ -15,10 +15,12 @@ import {
   RotateCcw,
   ArrowLeft,
   ListVideo,
-  Captions,
+  Download,
+  ExternalLink,
   X,
 } from 'lucide-react';
 import { useApp } from '@/components/app-provider';
+import { downloadFile } from '@/components/file-card';
 import { useFavorites } from '@/lib/store';
 
 /**
@@ -297,9 +299,19 @@ export default function VideoPage() {
                         className={isFav(v.id) ? 'text-amber-400' : ''}
                       />
                     </FeedBtn>
-                    <FeedBtn label="Captions" onClick={() => {}}>
-                      <Captions size={16} />
+                    <FeedBtn
+                      label="Download"
+                      onClick={() => downloadFile(v)}
+                    >
+                      <Download size={16} />
                     </FeedBtn>
+                    <Link
+                      href={`/viewer/${v.id}`}
+                      aria-label="Open in viewer"
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur transition-colors hover:bg-white/20"
+                    >
+                      <ExternalLink size={15} />
+                    </Link>
                   </div>
                 </div>
               </div>
