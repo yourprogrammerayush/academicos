@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bookmark, Download, Play } from 'lucide-react';
+import { Bookmark, Download, ArrowUpRight, Play } from 'lucide-react';
 import type { CatalogFile } from '@/lib/types';
 import { formatSize } from '@/lib/catalog';
 import { useFavorites } from '@/lib/store';
@@ -19,86 +19,119 @@ export function downloadFile(f: CatalogFile) {
 
 export function FileCard({ file, compact = false }: { file: CatalogFile; compact?: boolean }) {
   const { isFav, toggle } = useFavorites();
-  const inner = file.kind === 'video' || file.kind === 'audio';
+  const streamable = file.kind === 'video' || file.kind === 'audio';
+  const fav = isFav(file.id);
 
   if (compact) {
     return (
       <Link
         href={`/viewer/${file.id}`}
-        className="group flex items-center gap-3 rounded-lg border border-[var(--line)] bg-[var(--bg-elev)] px-3 py-2.5 transition-colors hover:bg-[var(--bg-hover)]"
+        className="group flex items-center gap-3 rounded-xl bg-elev px-3 py-2.5 shadow-hair transition-shadow hover:shadow-card"
       >
         <FileTypeIcon file={file} size={15} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-medium leading-5">{file.name}</p>
-          <p className="truncate text-[11px] text-[var(--fg-subtle)]">
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[13px] font-semibold leading-5 text-fg">
+            {file.name.replace(/\.pdf$/i, '')}
+          </span>
+          <span className="block truncate text-[11px] text-faint">
             {[file.type, file.subject, formatSize(file.size)].filter(Boolean).join(' · ')}
-          </p>
-        </div>
+          </span>
+        </span>
         <button
           type="button"
           onClick={(e) => {
             e.preventDefault();
             toggle(file.id);
           }}
-          aria-label={isFav(file.id) ? 'Remove bookmark' : 'Bookmark'}
-          className="rounded p-1.5 text-[var(--fg-subtle)] opacity-0 transition-opacity hover:bg-[var(--bg-sub)] hover:text-[var(--fg)] group-hover:opacity-100 focus-visible:opacity-100"
+          aria-label={fav ? 'Remove bookmark' : 'Bookmark'}
+          className={`relative z-10 shrink-0 rounded-md p-1.5 transition-all ${
+            fav ? 'text-accent' : 'text-faint opacity-0 hover:text-fg group-hover:opacity-100'
+          }`}
         >
-          <Bookmark size={14} fill={isFav(file.id) ? 'currentColor' : 'none'} />
+          <Bookmark size={14} fill={fav ? 'currentColor' : 'none'} strokeWidth={2} />
         </button>
       </Link>
     );
   }
 
   return (
-    <div className="group relative flex flex-col justify-between rounded-xl border border-[var(--line)] bg-[var(--bg-elev)] p-4 transition-all hover:border-[var(--line-strong)] hover:shadow-[var(--shadow-card)]">
-      <Link href={`/viewer/${file.id}`} className="focus-ring absolute inset-0 rounded-xl" aria-label={`Open ${file.name}`} />
-      <div className="pointer-events-none relative flex items-start gap-3">
-        <FileTypeIcon file={file} size={19} />
+    <article className="group relative flex flex-col rounded-xl bg-elev p-3.5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lift">
+      <Link
+        href={`/viewer/${file.id}`}
+        className="absolute inset-0 z-0 rounded-xl"
+        aria-label={`Open ${file.name}`}
+      />
+
+      <div className="pointer-events-none relative flex items-start gap-2.5">
+        <FileTypeIcon file={file} size={17} />
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-2 text-[13.5px] font-medium leading-[1.45] text-[var(--fg)]">{file.name}</p>
-          <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11.5px] text-[var(--fg-subtle)]">
-            <span className="font-medium text-[var(--fg-muted)]">{file.type}</span>
-            {file.subject && <span>· {file.subject}</span>}
-            {file.semester && <span>· {file.semester}</span>}
+          <p className="line-clamp-2 text-[13px] font-semibold leading-[1.42] tracking-[-0.008em] text-fg">
+            {file.name.replace(/\.pdf$/i, '')}
           </p>
         </div>
+        <ArrowUpRight
+          size={14}
+          strokeWidth={2.2}
+          className="mt-0.5 shrink-0 text-faint opacity-0 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent group-hover:opacity-100"
+        />
       </div>
-      <div className="relative mt-4 flex items-center justify-between">
-        <span className="text-[11px] text-[var(--fg-subtle)]">
-          {formatSize(file.size) || (inner ? 'Stream in-app' : 'Open in-app')}
+
+      <div className="relative mt-3 flex flex-wrap items-center gap-1">
+        <span className="chip">{file.type}</span>
+        {file.subject && (
+          <span className="truncate text-[10.5px] text-faint">
+            {file.subject}
+          </span>
+        )}
+        {!file.subject && file.semester && (
+          <span className="truncate text-[10.5px] text-faint">{file.semester}</span>
+        )}
+      </div>
+
+      <div className="relative mt-3 flex items-center justify-between border-t border-line pt-2.5">
+        <span className="tnum text-[10.5px] text-faint">
+          {formatSize(file.size) || (streamable ? 'Streams in-app' : 'Opens in-app')}
         </span>
-        <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+
+        <div className="flex items-center gap-0.5">
           <button
             type="button"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               toggle(file.id);
             }}
-            aria-label={isFav(file.id) ? 'Remove bookmark' : 'Bookmark'}
-            className="relative z-10 rounded-md p-1.5 text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
+            aria-label={fav ? 'Remove bookmark' : 'Bookmark'}
+            aria-pressed={fav}
+            className={`relative z-10 rounded-md p-1.5 transition-colors hover:bg-hover ${
+              fav ? 'text-accent' : 'text-faint hover:text-fg'
+            }`}
           >
-            <Bookmark size={15} fill={isFav(file.id) ? 'currentColor' : 'none'} />
+            <Bookmark size={14} fill={fav ? 'currentColor' : 'none'} strokeWidth={2} />
           </button>
           <button
             type="button"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               downloadFile(file);
             }}
             aria-label="Download"
-            className="relative z-10 rounded-md p-1.5 text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
+            className="relative z-10 rounded-md p-1.5 text-faint transition-colors hover:bg-hover hover:text-fg"
           >
-            <Download size={15} />
+            <Download size={14} strokeWidth={2} />
           </button>
-          <Link
-            href={`/viewer/${file.id}`}
-            aria-label="Open"
-            className="relative z-10 rounded-md p-1.5 text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
-          >
-            <Play size={15} />
-          </Link>
+          {streamable && (
+            <Link
+              href={`/viewer/${file.id}`}
+              aria-label="Play"
+              className="relative z-10 rounded-md p-1.5 text-faint transition-colors hover:bg-hover hover:text-accent"
+            >
+              <Play size={14} strokeWidth={2.2} />
+            </Link>
+          )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }

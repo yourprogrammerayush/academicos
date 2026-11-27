@@ -118,9 +118,9 @@ export function PdfViewer({ url, nightMode, zoom, onPagesReady, page, onPageChan
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
-        <AlertCircle size={22} className="text-[var(--warn)]" />
+        <AlertCircle size={22} className="text-warn" />
         <p className="max-w-sm text-[13px] font-medium">{error}</p>
-        <p className="max-w-sm text-[11.5px] text-[var(--fg-muted)]">
+        <p className="max-w-sm text-[11.5px] text-muted">
           The file may not be shared publicly, or Drive isn&apos;t connected yet. You can still download it directly.
         </p>
       </div>
@@ -129,10 +129,10 @@ export function PdfViewer({ url, nightMode, zoom, onPagesReady, page, onPageChan
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-auto bg-[var(--bg-sub)] p-4">
+      <div className="flex-1 overflow-auto bg-sunken p-4">
         <div className="mx-auto flex min-h-full items-start justify-center">
           {rendering && !error && (
-            <div className="absolute flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--bg-elev)] px-3 py-2 text-[11.5px] text-[var(--fg-muted)] shadow-[var(--shadow-card)]">
+            <div className="absolute flex items-center gap-2 rounded-lg border border-line bg-elev px-3 py-2 text-[11.5px] text-muted shadow-card">
               <Loader2 size={13} className="animate-spin" /> Rendering page…
             </div>
           )}
@@ -144,30 +144,30 @@ export function PdfViewer({ url, nightMode, zoom, onPagesReady, page, onPageChan
         </div>
       </div>
       {numPages > 1 && (
-        <div className="flex items-center justify-center gap-3 border-t border-[var(--line)] bg-[var(--bg-elev)] px-4 py-2">
+        <div className="flex items-center justify-center gap-3 border-t border-line bg-elev px-4 py-2">
           <button
             onClick={() => onPageChange(Math.max(1, page - 1))}
             disabled={page <= 1}
-            className="rounded-md p-1.5 text-[var(--fg-muted)] transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-30"
+            className="rounded-md p-1.5 text-muted transition-colors hover:bg-hover disabled:opacity-30"
             aria-label="Previous page"
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-[11.5px] tabular-nums text-[var(--fg-muted)]">
+          <span className="text-[11.5px] tabular-nums text-muted">
             Page <input
               type="number"
               value={page}
               min={1}
               max={numPages}
               onChange={(e) => onPageChange(Math.min(numPages, Math.max(1, Number(e.target.value) || 1)))}
-              className="mx-1 w-10 rounded border border-[var(--line)] bg-[var(--bg)] px-1 py-0.5 text-center text-[11.5px] outline-none focus:border-[var(--line-strong)]"
+              className="mx-1 w-10 rounded border border-line bg-canvas px-1 py-0.5 text-center text-[11.5px] outline-none focus:border-line-strong"
               aria-label="Page number"
             /> of {numPages}
           </span>
           <button
             onClick={() => onPageChange(Math.min(numPages, page + 1))}
             disabled={page >= numPages}
-            className="rounded-md p-1.5 text-[var(--fg-muted)] transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-30"
+            className="rounded-md p-1.5 text-muted transition-colors hover:bg-hover disabled:opacity-30"
             aria-label="Next page"
           >
             <ChevronRight size={16} />

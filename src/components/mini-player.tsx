@@ -44,11 +44,13 @@ export function MiniPlayer() {
   };
 
   return (
-    <div className="sticky bottom-14 z-40 border-t border-[var(--line)] bg-[var(--bg-elev)]/97 backdrop-blur md:bottom-0">
-      <div
-        className="absolute left-0 top-0 h-[2px] bg-[var(--brand)] transition-[width] duration-200"
-        style={{ width: `${pct}%` }}
-      />
+    <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] z-40 border-t border-line bg-elev/92 backdrop-blur-xl md:bottom-0">
+      <div className="absolute inset-x-0 top-0 h-[2.5px] bg-line">
+        <div
+          className="h-full bg-accent transition-[width] duration-200 ease-linear"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
       <audio
         ref={audioRef}
         src={src}
@@ -60,14 +62,14 @@ export function MiniPlayer() {
       />
       <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-3 py-2.5 sm:px-4">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[12.5px] font-medium">{file.name}</p>
-          <p className="truncate text-[10.5px] text-[var(--fg-subtle)]">
+          <p className="truncate text-[12.5px] font-semibold text-fg">{file.name.replace(/\.(mp3|m4a|wav|ogg)$/i, '')}</p>
+          <p className="truncate text-[10.5px] text-faint">
             {[file.subject, file.semester, 'Audio guide'].filter(Boolean).join(' · ')}
           </p>
         </div>
 
         <div className="hidden items-center gap-3 sm:flex">
-          <span className="w-9 text-right text-[10.5px] tabular-nums text-[var(--fg-subtle)]">{fmt(progress)}</span>
+          <span className="w-9 text-right text-[10.5px] tabular-nums text-faint">{fmt(progress)}</span>
           <input
             type="range"
             min={0}
@@ -78,10 +80,10 @@ export function MiniPlayer() {
               setProgress(v);
               if (audioRef.current) audioRef.current.currentTime = v;
             }}
-            className="h-1 w-40 cursor-pointer appearance-none rounded-full bg-[var(--line-strong)] accent-[var(--brand)] lg:w-64"
+            className="h-1 w-40 cursor-pointer appearance-none rounded-full bg-line-strong accent-accent lg:w-64"
             aria-label="Seek"
           />
-          <span className="w-9 text-[10.5px] tabular-nums text-[var(--fg-subtle)]">{fmt(duration)}</span>
+          <span className="w-9 text-[10.5px] tabular-nums text-faint">{fmt(duration)}</span>
         </div>
 
         <div className="flex items-center gap-0.5">
@@ -90,14 +92,14 @@ export function MiniPlayer() {
               if (audioRef.current) audioRef.current.currentTime = Math.max(0, progress - 15);
             }}
             aria-label="Rewind 15 seconds"
-            className="hidden rounded-md p-1.5 text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)] sm:block"
+            className="hidden rounded-md p-1.5 text-muted hover:bg-hover hover:text-fg sm:block"
           >
             <SkipBack size={15} />
           </button>
           <button
             onClick={togglePlay}
             aria-label={player.playing ? 'Pause' : 'Play'}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--fg)] text-[var(--bg)] transition-transform hover:scale-[1.04]"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-fg text-canvas shadow-lift transition-transform active:scale-95"
           >
             {player.playing ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" className="ml-0.5" />}
           </button>
@@ -106,7 +108,7 @@ export function MiniPlayer() {
               if (audioRef.current) audioRef.current.currentTime = Math.min(duration, progress + 15);
             }}
             aria-label="Forward 15 seconds"
-            className="hidden rounded-md p-1.5 text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)] sm:block"
+            className="hidden rounded-md p-1.5 text-muted hover:bg-hover hover:text-fg sm:block"
           >
             <SkipForward size={15} />
           </button>
@@ -115,7 +117,7 @@ export function MiniPlayer() {
         <div className="hidden items-center gap-0.5 md:flex">
           <button
             onClick={() => setSpeed((s) => (s >= 2 ? 0.75 : s === 0.75 ? 1 : s + 0.25))}
-            className="rounded-md px-1.5 py-1 text-[10.5px] font-semibold tabular-nums text-[var(--fg-muted)] hover:bg-[var(--bg-hover)]"
+            className="rounded-md px-1.5 py-1 text-[10.5px] font-semibold tabular-nums text-muted hover:bg-hover"
             aria-label="Playback speed"
           >
             {speed}x
@@ -123,7 +125,7 @@ export function MiniPlayer() {
           <button
             onClick={() => setMuted((m) => !m)}
             aria-label={muted ? 'Unmute' : 'Mute'}
-            className="rounded-md p-1.5 text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
+            className="rounded-md p-1.5 text-muted hover:bg-hover hover:text-fg"
           >
             {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
           </button>
@@ -132,14 +134,14 @@ export function MiniPlayer() {
         <Link
           href={`/audio`}
           aria-label="Open podcast player"
-          className="hidden rounded-md p-1.5 text-[var(--fg-subtle)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)] sm:block"
+          className="hidden rounded-md p-1.5 text-faint hover:bg-hover hover:text-fg sm:block"
         >
           <ArrowUpRight size={15} />
         </Link>
         <button
           onClick={closePlayer}
           aria-label="Close player"
-          className="rounded-md p-1.5 text-[var(--fg-subtle)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
+          className="rounded-md p-1.5 text-faint hover:bg-hover hover:text-fg"
         >
           <X size={16} />
         </button>

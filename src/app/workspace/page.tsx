@@ -83,9 +83,9 @@ export default function WorkspacePage() {
       <div className="mx-auto max-w-[1360px] px-4 pb-8 pt-5 sm:px-6 md:pt-7 lg:px-8">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="label-eyebrow">Workspace</p>
-            <h1 className="mt-1.5 font-serif text-[25px] font-bold tracking-[-0.02em] sm:text-[29px]">Your personal study space.</h1>
-            <p className="mt-1.5 max-w-[560px] text-[13px] text-[var(--fg-muted)]">
+            <p className="eyebrow">Workspace</p>
+            <h1 className="mt-1.5 text-[25px] font-bold h-title tracking-[-0.02em] sm:text-[29px]">Your personal study space.</h1>
+            <p className="mt-1.5 max-w-[560px] text-[13px] text-muted">
               Saved locally on this device — instant, private, zero cost.
               {!signedIn && ' Sign in to keep it across devices.'}
             </p>
@@ -111,7 +111,7 @@ export default function WorkspacePage() {
         </div>
 
         {/* Tabs */}
-        <div className="no-scrollbar mb-4 flex gap-1 overflow-x-auto border-b border-[var(--line)]">
+        <div className="no-scrollbar mb-4 flex gap-1 overflow-x-auto border-b border-line">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -120,12 +120,12 @@ export default function WorkspacePage() {
                 setOpenCollection(null);
               }}
               className={`relative flex items-center gap-1.5 whitespace-nowrap px-3 py-2.5 text-[12.5px] font-medium transition-colors ${
-                tab === t.id ? 'text-[var(--fg)]' : 'text-[var(--fg-muted)] hover:text-[var(--fg)]'
+                tab === t.id ? 'text-fg' : 'text-muted hover:text-fg'
               }`}
             >
               <t.icon size={13} />
               {t.label}
-              {tab === t.id && <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--fg)]" />}
+              {tab === t.id && <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-fg" />}
             </button>
           ))}
         </div>
@@ -145,11 +145,11 @@ export default function WorkspacePage() {
             <div>
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setOpenCollection(null)} className="rounded-md p-1 text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]" aria-label="Back">
+                  <button onClick={() => setOpenCollection(null)} className="rounded-md p-1 text-muted hover:bg-hover hover:text-fg" aria-label="Back">
                     <X size={16} />
                   </button>
-                  <h2 className="font-serif text-[19px] font-bold">{activeCollection.name}</h2>
-                  <span className="text-[11.5px] text-[var(--fg-subtle)]">{collectionFiles.length} files</span>
+                  <h2 className="text-[19px] font-bold h-title">{activeCollection.name}</h2>
+                  <span className="text-[11.5px] text-faint">{collectionFiles.length} files</span>
                 </div>
                 <button
                   onClick={() => {
@@ -157,7 +157,7 @@ export default function WorkspacePage() {
                     persistCollections(collections.filter((c) => c.id !== activeCollection.id));
                     setOpenCollection(null);
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11.5px] text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--warn)]"
+                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11.5px] text-muted hover:bg-hover hover:text-warn"
                 >
                   <Trash2 size={12} /> Delete
                 </button>
@@ -176,20 +176,20 @@ export default function WorkspacePage() {
                 <button
                   key={c.id}
                   onClick={() => setOpenCollection(c.id)}
-                  className="group flex items-start gap-3 rounded-xl border border-[var(--line)] bg-[var(--bg-elev)] p-4 text-left transition-all hover:border-[var(--line-strong)] hover:shadow-[var(--shadow-card)]"
+                  className="group flex items-start gap-3 rounded-xl border border-line bg-elev p-4 text-left transition-all hover:border-line-strong hover:shadow-card"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--bg-sub)] text-[var(--fg-muted)] ring-1 ring-[var(--line)]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-sunken text-muted ring-1 ring-line">
                     <FolderClosed size={16} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[13.5px] font-medium">{c.name}</span>
-                    <span className="mt-0.5 block text-[11px] text-[var(--fg-subtle)]">{c.fileIds.length} files · created {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+                    <span className="mt-0.5 block text-[11px] text-faint">{c.fileIds.length} files · created {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                   </span>
                 </button>
               ))}
               <button
                 onClick={() => setCreating(true)}
-                className="flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-[var(--line)] text-[12px] text-[var(--fg-subtle)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--fg-muted)]"
+                className="flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-line text-[12px] text-faint transition-colors hover:border-line-strong hover:text-muted"
               >
                 <Plus size={17} /> New collection
               </button>
@@ -199,12 +199,12 @@ export default function WorkspacePage() {
 
         {tab === 'recent' && (
           recentFiles.length ? (
-            <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--bg-elev)]">
+            <div className="overflow-hidden rounded-xl border border-line bg-elev">
               {recentFiles.map((f, i) => (
-                <Link key={f!.id} href={`/viewer/${f!.id}`} className={`flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-[var(--bg-hover)] ${i < recentFiles.length - 1 ? 'border-b border-[var(--line)]' : ''}`}>
-                  <span className="text-[10.5px] tabular-nums text-[var(--fg-subtle)]">{String(recents[i]?.at ? new Date(recents[i].at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '').padStart(5, ' ')}</span>
+                <Link key={f!.id} href={`/viewer/${f!.id}`} className={`flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-hover ${i < recentFiles.length - 1 ? 'border-b border-line' : ''}`}>
+                  <span className="text-[10.5px] tabular-nums text-faint">{String(recents[i]?.at ? new Date(recents[i].at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '').padStart(5, ' ')}</span>
                   <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium">{f!.name}</span>
-                  <span className="hidden text-[10.5px] text-[var(--fg-subtle)] sm:block">{f!.type}</span>
+                  <span className="hidden text-[10.5px] text-faint sm:block">{f!.type}</span>
                 </Link>
               ))}
             </div>
@@ -215,15 +215,15 @@ export default function WorkspacePage() {
 
         {tab === 'downloads' && (
           downloads.length ? (
-            <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--bg-elev)]">
+            <div className="overflow-hidden rounded-xl border border-line bg-elev">
               {downloads.map((d, i) => {
                 const f = catalog.files.find((x) => x.id === d.id);
                 return (
-                  <div key={d.id} className={`flex items-center gap-3 px-3.5 py-2.5 ${i < downloads.length - 1 ? 'border-b border-[var(--line)]' : ''}`}>
-                    <Download size={14} className="shrink-0 text-[var(--fg-subtle)]" />
+                  <div key={d.id} className={`flex items-center gap-3 px-3.5 py-2.5 ${i < downloads.length - 1 ? 'border-b border-line' : ''}`}>
+                    <Download size={14} className="shrink-0 text-faint" />
                     <span className="min-w-0 flex-1 truncate text-[12.5px]">{d.name}</span>
-                    <span className="shrink-0 text-[10.5px] text-[var(--fg-subtle)]">{f ? formatSize(f.size) : ''}</span>
-                    <span className="hidden shrink-0 text-[10.5px] text-[var(--fg-subtle)] sm:block">
+                    <span className="shrink-0 text-[10.5px] text-faint">{f ? formatSize(f.size) : ''}</span>
+                    <span className="hidden shrink-0 text-[10.5px] text-faint sm:block">
                       {new Date(d.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                     </span>
                   </div>
@@ -254,16 +254,16 @@ export default function WorkspacePage() {
       {creating && (
         <div className="fixed inset-0 z-[85] flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-[#0B1220]/45 backdrop-blur-[2px]" onClick={() => setCreating(false)} />
-          <div className="animate-fade-up relative w-full max-w-[380px] rounded-xl border border-[var(--line)] bg-[var(--bg-elev)] p-4 shadow-[var(--shadow-pop)]">
+          <div className="animate-fade-up relative w-full max-w-[380px] rounded-xl border border-line bg-elev p-4 shadow-pop">
             <p className="text-[14px] font-semibold">New collection</p>
-            <p className="mt-1 text-[11.5px] text-[var(--fg-muted)]">Group files for an exam, a subject, or a late-night cram session.</p>
+            <p className="mt-1 text-[11.5px] text-muted">Group files for an exam, a subject, or a late-night cram session.</p>
             <input
               autoFocus
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && createCollection()}
               placeholder="e.g. Midterm Prep, Exam Night"
-              className="mt-3 h-10 w-full rounded-lg border border-[var(--line)] bg-[var(--bg-sub)] px-3 text-[13px] outline-none focus:border-[var(--line-strong)]"
+              className="mt-3 h-10 w-full rounded-lg border border-line bg-sunken px-3 text-[13px] outline-none focus:border-line-strong"
             />
             <div className="mt-3 flex justify-end gap-2">
               <button onClick={() => setCreating(false)} className="btn btn-quiet text-[12px]">Cancel</button>
@@ -278,19 +278,19 @@ export default function WorkspacePage() {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-elev)] px-3 py-2.5">
-      <p className="font-serif text-[20px] font-bold leading-none tracking-[-0.02em] tabular-nums">{value}</p>
-      <p className="mt-1 text-[10.5px] uppercase tracking-wide text-[var(--fg-subtle)]">{label}</p>
+    <div className="rounded-lg border border-line bg-elev px-3 py-2.5">
+      <p className="text-[20px] font-bold h-title leading-none tracking-[-0.02em] tabular-nums">{value}</p>
+      <p className="mt-1 text-[10.5px] uppercase tracking-wide text-faint">{label}</p>
     </div>
   );
 }
 
 function Empty({ icon, title, text, cta }: { icon: React.ReactNode; title: string; text: string; cta?: { href: string; label: string } }) {
   return (
-    <div className="rounded-xl border border-dashed border-[var(--line)] px-6 py-14 text-center">
-      <span className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--bg-sub)] text-[var(--fg-subtle)]">{icon}</span>
-      <p className="font-serif text-[16px] font-bold">{title}</p>
-      <p className="mx-auto mt-1.5 max-w-sm text-[12.5px] text-[var(--fg-muted)]">{text}</p>
+    <div className="rounded-xl border border-dashed border-line px-6 py-14 text-center">
+      <span className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-sunken text-faint">{icon}</span>
+      <p className="text-[16px] font-bold h-title">{title}</p>
+      <p className="mx-auto mt-1.5 max-w-sm text-[12.5px] text-muted">{text}</p>
       {cta && <Link href={cta.href} className="btn btn-ghost mt-4 text-[12px]">{cta.label}</Link>}
     </div>
   );

@@ -1,26 +1,43 @@
-import { NextResponse } from 'next/server';
-import { SEED_CATALOG } from '@/data/seed-catalog';
-import { indexDriveFolder } from '@/lib/drive';
+import { NextRequest, NextResponse } from 'next/server';
+import { getCatalog, syncNow, cacheStatus } from '@/lib/drive-cache';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  const apiKey = process.env.GOOGLE_DRIVE_API_KEY;
-  const rootId = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID || '1WqBC4aCKdxNm14HIshBSwV-080svsNGC';
+/**
+ * GET /api/catalog
+ *   ?sync=1     force an upstream refresh (bypasses cache)
+ *   ?status=1   cache diagnostics without touching Drive
+ */
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
 
-  if (!apiKey) {
-    return NextResponse.json({ ...SEED_CATALOG, driveConnected: false, mode: 'curated' });
+  if (searchParams.get('status') === '1') {
+    return NextResponse.json(cacheStatus(), {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   }
 
-  try {
-    const catalog = await indexDriveFolder(rootId, apiKey);
-    if (catalog.files.length === 0) {
-      return NextResponse.json({ ...SEED_CATALOG, driveConnected: false, mode: 'curated' });
+  const force = searchParams.get('sync') === '1';
+  const result = force ? await syncNow() : await getCatalog({ force });
+
+  return NextResponse.json(
+    {
+      files: result.catalog.files,
+      folders: result.catalog.folders,
+      rootName: result.catalog.rootName,
+      driveConnected: result.mode === 'live',
+      mode: result.mode,
+      syncedAt: new Date(result.fetchedAt).toISOString(),
+      fromCache: result.fromCache,
+      changes: result.changes,
+      ...(result.error ? { note: result.error } : {}),
+    },
+    {
+      headers: {
+        // Edge may serve a stale copy for a minute while we revalidate.
+        'Cache-Control': 'public, max-age=0, s-maxage=30, stale-while-revalidate=300',
+      },
     }
-    return NextResponse.json({ ...catalog, driveConnected: true, mode: 'live' });
-  } catch (err) {
-    console.error('[catalog] Drive indexing failed:', err);
-    return NextResponse.json({ ...SEED_CATALOG, driveConnected: false, mode: 'curated' });
-  }
+  );
 }

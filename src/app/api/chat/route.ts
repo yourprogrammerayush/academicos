@@ -1,22 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SEED_CATALOG } from '@/data/seed-catalog';
-import { indexDriveFolder } from '@/lib/drive';
 import { GROQ_MODELS, localAnswer, systemPrompt } from '@/lib/ai';
+import { getCatalog } from '@/lib/drive-cache';
 import type { CatalogFile } from '@/lib/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-async function getCatalogFiles(): Promise<CatalogFile[]> {
-  const apiKey = process.env.GOOGLE_DRIVE_API_KEY;
-  const rootId = process.env.GOOGLE_DRIVE_ROOT_FOLDER_ID || '1WqBC4aCKdxNm14HIshBSwV-080svsNGC';
-  if (!apiKey) return SEED_CATALOG.files;
-  try {
-    const catalog = await indexDriveFolder(rootId, apiKey);
-    return catalog.files.length ? catalog.files : SEED_CATALOG.files;
-  } catch {
-    return SEED_CATALOG.files;
-  }
+/** Reads through the shared cache so the AI always sees the latest index. */
+async function getCatalogFiles(): Promise<{ files: CatalogFile[]; rootName: string }> {
+  const result = await getCatalog();
+  return {
+    files: result.catalog.files.length ? result.catalog.files : SEED_CATALOG.files,
+    rootName: result.catalog.rootName || SEED_CATALOG.rootName,
+  };
 }
 
 async function groqStream(messages: { role: string; content: string }[], model: string, apiKey: string) {
@@ -39,7 +36,7 @@ export async function POST(req: NextRequest) {
   };
   const messages = body.messages || [];
   const lastUser = [...messages].reverse().find((m) => m.role === 'user')?.content || body.query || '';
-  const files = await getCatalogFiles();
+  const { files, rootName } = await getCatalogFiles();
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
@@ -48,7 +45,7 @@ export async function POST(req: NextRequest) {
   }
 
   const groqMessages = [
-    { role: 'system', content: systemPrompt(files) },
+    { role: 'system', content: systemPrompt(files, rootName) },
     ...messages.slice(-8).map((m) => ({ role: m.role, content: m.content })),
   ];
 

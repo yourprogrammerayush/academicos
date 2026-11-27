@@ -67,11 +67,11 @@ export function AuthModal() {
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center px-4 py-8">
       <div className="absolute inset-0 bg-[#0B1220]/50 backdrop-blur-[3px]" onClick={close} />
-      <div className="animate-fade-up relative w-full max-w-[430px] overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--bg-elev)] shadow-[var(--shadow-pop)]">
+      <div className="animate-fade-up relative w-full max-w-[430px] overflow-hidden rounded-2xl border border-line bg-elev shadow-pop">
         <button
           onClick={close}
           aria-label="Close"
-          className="absolute right-3 top-3 rounded-md p-1.5 text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
+          className="absolute right-3 top-3 rounded-md p-1.5 text-faint transition-colors hover:bg-hover hover:text-fg"
         >
           <X size={16} />
         </button>
@@ -79,35 +79,35 @@ export function AuthModal() {
         <div className="px-6 pt-7">
           <div className="flex items-center gap-2.5">
             <Image src="/logo.png" alt="AcademicOS" width={80} height={48} className="h-7 w-auto" />
-            <span className="font-serif text-[17px] font-bold tracking-tight">
-              Academic<span className="text-[var(--brand)]">OS</span>
+            <span className="text-[17px] font-bold h-title tracking-tight">
+              Academic<span className="text-accent">OS</span>
             </span>
           </div>
         </div>
 
         {signedIn ? (
           <div className="px-6 pb-6 pt-5">
-            <div className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--bg-sub)] p-3.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--fg)] text-[13px] font-semibold text-[var(--bg)]">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-sunken p-3.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-fg text-[13px] font-semibold text-canvas">
                 {userName.slice(0, 1).toUpperCase()}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13.5px] font-medium">{userName}</p>
-                <p className="text-[11.5px] text-[var(--fg-subtle)]">Profile synced · Guest data preserved</p>
+                <p className="text-[11.5px] text-faint">Profile synced · Guest data preserved</p>
               </div>
-              <Check size={16} className="text-[var(--ok)]" />
+              <Check size={16} className="text-ok" />
             </div>
             <button onClick={signOut} className="btn btn-ghost mt-4 w-full justify-center">
               Sign out
             </button>
-            <p className="mt-5 text-center text-[10.5px] text-[var(--fg-subtle)]">Web App Created By - Ayush Jha, 2CSE-4</p>
+            <p className="mt-5 text-center text-[10.5px] text-faint">Web App Created By - Ayush Jha, 2CSE-4</p>
           </div>
         ) : (
           <div className="px-6 pb-6 pt-4">
             <h2 className="text-[19px] font-semibold tracking-[-0.01em]">
               {mode === 'signup' ? 'Create your account' : mode === 'otp' ? 'Sign in with a code' : 'Welcome back'}
             </h2>
-            <p className="mt-1 text-[12.5px] text-[var(--fg-muted)]">
+            <p className="mt-1 text-[12.5px] text-muted">
               {mode === 'otp'
                 ? 'No password needed — we’ll email you a one-time code.'
                 : 'Sync favorites, collections and progress across devices.'}
@@ -133,16 +133,16 @@ export function AuthModal() {
               </svg>
               {HAS_CLERK ? 'Continue with Google' : 'Create local profile'}
             </button>
-            <p className="mt-2 text-center text-[10px] leading-relaxed text-[var(--fg-subtle)]">
+            <p className="mt-2 text-center text-[10px] leading-relaxed text-faint">
               {HAS_CLERK
                 ? 'Secured by Clerk · Google one-tap'
                 : 'Stored on this device only. Add Clerk keys to enable Google one-tap sync.'}
             </p>
 
             <div className="my-4 flex items-center gap-3">
-              <span className="h-px flex-1 bg-[var(--line)]" />
-              <span className="text-[10.5px] uppercase tracking-wide text-[var(--fg-subtle)]">or</span>
-              <span className="h-px flex-1 bg-[var(--line)]" />
+              <span className="h-px flex-1 bg-line" />
+              <span className="text-[10.5px] uppercase tracking-wide text-faint">or</span>
+              <span className="h-px flex-1 bg-line" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-2.5">
@@ -153,7 +153,7 @@ export function AuthModal() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Full name"
                     autoComplete="name"
-                    className="h-10 w-full bg-transparent text-[13.5px] outline-none placeholder:text-[var(--fg-subtle)]"
+                    className="h-10 w-full bg-transparent text-[13.5px] outline-none placeholder:text-faint"
                   />
                 </Field>
               )}
@@ -164,7 +164,7 @@ export function AuthModal() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email address"
                   autoComplete="email"
-                  className="h-10 w-full bg-transparent text-[13.5px] outline-none placeholder:text-[var(--fg-subtle)]"
+                  className="h-10 w-full bg-transparent text-[13.5px] outline-none placeholder:text-faint"
                 />
               </Field>
               {mode !== 'otp' ? (
@@ -175,7 +175,7 @@ export function AuthModal() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                     autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                    className="h-10 w-full bg-transparent text-[13.5px] outline-none placeholder:text-[var(--fg-subtle)]"
+                    className="h-10 w-full bg-transparent text-[13.5px] outline-none placeholder:text-faint"
                   />
                 </Field>
               ) : otpSent ? (
@@ -186,12 +186,12 @@ export function AuthModal() {
                     placeholder="6-digit code"
                     inputMode="numeric"
                     maxLength={6}
-                    className="h-10 w-full bg-transparent text-[13.5px] tracking-[0.3em] outline-none placeholder:tracking-normal placeholder:text-[var(--fg-subtle)]"
+                    className="h-10 w-full bg-transparent text-[13.5px] tracking-[0.3em] outline-none placeholder:tracking-normal placeholder:text-faint"
                   />
                 </Field>
               ) : null}
 
-              {error && <p className="text-[11.5px] text-[var(--warn)]">{error}</p>}
+              {error && <p className="text-[11.5px] text-warn">{error}</p>}
 
               <button type="submit" disabled={loading} className="btn btn-brand mt-1 w-full justify-center py-2.5">
                 {loading ? (
@@ -207,31 +207,31 @@ export function AuthModal() {
 
             {/* Turnstile placeholder — renders real widget when key is present */}
             {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-              <div className="mt-3 rounded-lg border border-dashed border-[var(--line)] p-2 text-center text-[10.5px] text-[var(--fg-subtle)]">
+              <div className="mt-3 rounded-lg border border-dashed border-line p-2 text-center text-[10.5px] text-faint">
                 Protected by Cloudflare Turnstile
               </div>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11.5px] text-[var(--fg-muted)]">
-              <button onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')} className="hover:text-[var(--fg)] hover:underline">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11.5px] text-muted">
+              <button onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')} className="hover:text-fg hover:underline">
                 {mode === 'signup' ? 'I already have an account' : 'Create an account'}
               </button>
-              <span className="text-[var(--line-strong)]">·</span>
+              <span className="text-line-strong">·</span>
               <button
                 onClick={() => {
                   setMode('otp');
                   setOtpSent(false);
                 }}
-                className="hover:text-[var(--fg)] hover:underline"
+                className="hover:text-fg hover:underline"
               >
                 Email code
               </button>
-              <span className="text-[var(--line-strong)]">·</span>
-              <button onClick={close} className="hover:text-[var(--fg)] hover:underline">
+              <span className="text-line-strong">·</span>
+              <button onClick={close} className="hover:text-fg hover:underline">
                 Continue as guest
               </button>
             </div>
-            <p className="mt-4 text-center text-[10px] leading-relaxed text-[var(--fg-subtle)]">
+            <p className="mt-4 text-center text-[10px] leading-relaxed text-faint">
               Guest mode works fully offline-local. Sign-in is optional.
               <br />
               Web App Created By - Ayush Jha, 2CSE-4
@@ -245,8 +245,8 @@ export function AuthModal() {
 
 function Field({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--bg-sub)] px-3 transition-colors focus-within:border-[var(--line-strong)] focus-within:bg-[var(--bg-elev)]">
-      <span className="text-[var(--fg-subtle)]">{icon}</span>
+    <div className="flex items-center gap-2.5 rounded-lg border border-line bg-sunken px-3 transition-colors focus-within:border-line-strong focus-within:bg-elev">
+      <span className="text-faint">{icon}</span>
       {children}
     </div>
   );

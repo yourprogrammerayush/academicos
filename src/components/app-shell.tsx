@@ -9,6 +9,7 @@ import { AuthModal } from './auth-modal';
 import { MiniPlayer } from './mini-player';
 import { Footer } from './footer';
 import { InstallBanner } from './install-banner';
+import { SyncToast } from './sync-pill';
 
 function ShellInner({ children }: { children: React.ReactNode }) {
   const { player } = useApp();
@@ -19,7 +20,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
 
   if (immersive) {
     return (
-      <div className="flex min-h-screen flex-col bg-[var(--bg)]">
+      <div className="flex min-h-screen flex-col bg-canvas">
         <div className="flex-1">{children}</div>
         <CommandPalette />
         <AuthModal />
@@ -28,7 +29,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg)]">
+    <div className="flex min-h-screen bg-canvas">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <div
@@ -47,6 +48,7 @@ function ShellInner({ children }: { children: React.ReactNode }) {
       <CommandPalette />
       <AuthModal />
       <InstallBanner />
+      <SyncToast />
     </div>
   );
 }

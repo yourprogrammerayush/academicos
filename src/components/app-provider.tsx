@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Catalog, CatalogFile } from '@/lib/types';
 import { SEED_CATALOG } from '@/data/seed-catalog';
 import { applyTheme, store } from '@/lib/store';
@@ -19,10 +12,19 @@ interface PlayerState {
   playing: boolean;
 }
 
+type SyncState = {
+  mode: 'live' | 'curated';
+  syncedAt: string | null;
+  syncing: boolean;
+  notice: string | null;
+};
+
 interface AppCtx {
   catalog: Catalog;
   loading: boolean;
   driveConnected: boolean;
+  sync: SyncState;
+  refreshCatalog: (opts?: { silent?: boolean; force?: boolean }) => Promise<void>;
   query: string;
   setQuery: (q: string) => void;
   theme: Theme;
@@ -58,10 +60,19 @@ interface InstallEvent extends Event {
   userChoice: Promise<{ outcome: string }>;
 }
 
+type CatalogPayload = Catalog & {
+  driveConnected?: boolean;
+  mode?: 'live' | 'curated';
+  syncedAt?: string;
+  changes?: { added: CatalogFile[]; removed: string[]; unchanged: number };
+  note?: string;
+};
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [catalog, setCatalog] = useState<Catalog>(SEED_CATALOG);
   const [loading, setLoading] = useState(true);
   const [driveConnected, setDriveConnected] = useState(false);
+  const [sync, setSync] = useState<SyncState>({ mode: 'curated', syncedAt: null, syncing: false, notice: null });
   const [query, setQuery] = useState('');
   const [theme, setThemeState] = useState<Theme>('system');
   const [player, setPlayer] = useState<PlayerState>({ file: null, playing: false });
@@ -70,26 +81,68 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [signedIn, setSignedIn] = useState(false);
   const [userName, setUserName] = useState('Guest');
   const [installEvent, setInstallEvent] = useState<InstallEvent | null>(null);
-  const [swReady, setSwReady] = useState(false);
 
-  // Load catalog
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/catalog')
-      .then((r) => r.json())
-      .then((data: Catalog & { driveConnected?: boolean }) => {
-        if (cancelled) return;
-        if (data && Array.isArray(data.files) && data.files.length) {
-          setCatalog(data);
-          setDriveConnected(Boolean(data.driveConnected));
-        }
-      })
-      .catch(() => {})
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
+  const loadCatalog = useCallback(async (opts: { silent?: boolean; force?: boolean } = {}) => {
+    if (!opts.silent) setSync((s) => ({ ...s, syncing: true }));
+    try {
+      const url = opts.force ? '/api/catalog?sync=1' : '/api/catalog';
+      const res = await fetch(url, { cache: 'no-store' });
+      const data = (await res.json()) as CatalogPayload;
+      if (!data || !Array.isArray(data.files) || data.files.length === 0) return;
+
+      setCatalog({
+        files: data.files,
+        folders: data.folders || [],
+        rootName: data.rootName,
+        indexedAt: data.syncedAt || new Date().toISOString(),
+        source: data.driveConnected ? 'drive' : 'demo',
+      });
+      setDriveConnected(Boolean(data.driveConnected));
+      setSync({
+        mode: data.mode || (data.driveConnected ? 'live' : 'curated'),
+        syncedAt: data.syncedAt || null,
+        syncing: false,
+        notice: null,
+      });
+
+      // Surface genuinely new files on a forced sync
+      if (opts.force && data.changes?.added?.length) {
+        const n = data.changes.added.length;
+        setSync((s) => ({
+          ...s,
+          notice: `${n} new ${n === 1 ? 'file' : 'files'} added to your library`,
+        }));
+        window.setTimeout(() => setSync((s) => ({ ...s, notice: null })), 8000);
+      }
+    } catch {
+      /* keep whatever we already have */
+    } finally {
+      setSync((s) => ({ ...s, syncing: false }));
+      setLoading(false);
+    }
   }, []);
+
+  // First load
+  useEffect(() => {
+    void loadCatalog();
+  }, [loadCatalog]);
+
+  // Refresh when the tab regains focus (covers the "I just uploaded a file" case)
+  useEffect(() => {
+    let last = Date.now();
+    const maybeRefresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      if (Date.now() - last < 60_000) return;
+      last = Date.now();
+      void loadCatalog({ silent: true, force: true });
+    };
+    document.addEventListener('visibilitychange', maybeRefresh);
+    window.addEventListener('focus', maybeRefresh);
+    return () => {
+      document.removeEventListener('visibilitychange', maybeRefresh);
+      window.removeEventListener('focus', maybeRefresh);
+    };
+  }, [loadCatalog]);
 
   // Theme
   useEffect(() => {
@@ -120,13 +173,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Service worker
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then(() => setSwReady(true))
-        .catch(() => {});
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
   }, []);
-  void swReady;
 
   // Install prompt
   useEffect(() => {
@@ -146,14 +195,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
   }, [installEvent]);
 
-  const play = useCallback((f: CatalogFile) => {
-    setPlayer({ file: f, playing: true });
-  }, []);
-
-  const togglePlay = useCallback(() => {
-    setPlayer((p) => (p.file ? { ...p, playing: !p.playing } : p));
-  }, []);
-
+  const play = useCallback((f: CatalogFile) => setPlayer({ file: f, playing: true }), []);
+  const togglePlay = useCallback(
+    () => setPlayer((p) => (p.file ? { ...p, playing: !p.playing } : p)),
+    []
+  );
   const closePlayer = useCallback(() => setPlayer({ file: null, playing: false }), []);
   const setPlaying = useCallback((playing: boolean) => setPlayer((p) => ({ ...p, playing })), []);
 
@@ -170,16 +216,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSignedIn(false);
   }, []);
 
-  // Global shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setPaletteOpen((o) => !o);
       }
-      if (e.key === 'Escape') {
-        setPaletteOpen(false);
-      }
+      if (e.key === 'Escape') setPaletteOpen(false);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -195,6 +238,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     catalog,
     loading,
     driveConnected,
+    sync,
+    refreshCatalog: loadCatalog,
     query,
     setQuery,
     theme,

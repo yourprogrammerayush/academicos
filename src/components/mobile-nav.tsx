@@ -8,139 +8,186 @@ import {
   Library,
   Sparkle,
   Bookmark,
+  Search,
   Film,
   Headphones,
   X,
-  Plus,
+  LayoutGrid,
+  ChevronLeft,
 } from 'lucide-react';
 import { useApp } from './app-provider';
+import { Logo } from './logo';
 
-const ITEMS = [
+/** Sticky mobile header. Sits above page content, never overlaps safe-area. */
+export function MobileTopBar({
+  title,
+  back,
+  right,
+}: {
+  title?: string;
+  back?: string | boolean;
+  right?: React.ReactNode;
+}) {
+  return (
+    <header className="sticky top-0 z-40 border-b border-line bg-canvas/85 backdrop-blur-xl md:hidden">
+      <div className="safe-t">
+        <div className="flex h-[52px] items-center gap-2 px-3">
+          {back ? (
+            <Link
+              href={typeof back === 'string' ? back : '/library'}
+              aria-label="Back"
+              className="btn-icon -ml-1 h-9 w-9"
+            >
+              <ChevronLeft size={19} strokeWidth={2.1} />
+            </Link>
+          ) : (
+            <Logo size={26} withWordmark={false} href={null} />
+          )}
+          <div className="min-w-0 flex-1">
+            {title ? (
+              <p className="truncate text-[14.5px] font-semibold tracking-[-0.02em] text-fg">{title}</p>
+            ) : (
+              <Logo size={0} withWordmark />
+            )}
+          </div>
+          {right}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+const PRIMARY = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/library', label: 'Library', icon: Library },
-  { href: '/ai', label: 'Study AI', icon: Sparkle },
+  { href: '/ai', label: 'AI', icon: Sparkle },
   { href: '/workspace', label: 'Saved', icon: Bookmark },
 ];
 
-const MORE = [
-  { href: '/video', label: 'Video lectures', icon: Film, hint: 'Reels-style feed' },
-  { href: '/audio', label: 'Podcasts', icon: Headphones, hint: 'Audio guides' },
+const SHEET = [
+  { href: '/video', label: 'Video lectures', desc: 'Reels-style lecture feed', icon: Film },
+  { href: '/audio', label: 'Podcasts', desc: 'Listen to lecture audio', icon: Headphones },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
-  const [more, setMore] = useState(false);
+  const { setPaletteOpen } = useApp();
+  const [open, setOpen] = useState(false);
 
-  // Close the sheet on navigation
-  useEffect(() => {
-    setMore(false);
-  }, [pathname]);
+  useEffect(() => setOpen(false), [pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = more ? 'hidden' : '';
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
     };
-  }, [more]);
-
-  const mediaActive = pathname.startsWith('/video') || pathname.startsWith('/audio');
+  }, [open]);
 
   return (
     <>
-      {more && (
-        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-label="More sections">
-          <div className="absolute inset-0 bg-[#0B1220]/40 backdrop-blur-[2px]" onClick={() => setMore(false)} />
-          <div
-            className="animate-fade-up absolute inset-x-0 bottom-0 rounded-t-2xl border-t border-[var(--line)] bg-[var(--bg-elev)] p-4 pb-6"
-            style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <p className="label-eyebrow">Media</p>
+      {open && (
+        <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true" aria-label="More sections">
+          <button
+            className="absolute inset-0 animate-fade-in bg-navy-950/40 backdrop-blur-[2px]"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+            tabIndex={-1}
+          />
+          <div className="absolute inset-x-0 bottom-0 animate-sheet-up safe-b">
+            <div className="mx-2 mb-2 overflow-hidden rounded-[22px] bg-elev shadow-pop">
+              <div className="flex items-center justify-between px-4 pb-1 pt-3">
+                <span className="eyebrow">Also in AcademicOS</span>
+                <button onClick={() => setOpen(false)} className="btn-icon h-7 w-7" aria-label="Close">
+                  <X size={15} />
+                </button>
+              </div>
+              {SHEET.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3.5 px-4 py-3 transition-colors active:bg-hover"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mist text-fg">
+                    <item.icon size={18} strokeWidth={1.9} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[14px] font-semibold leading-tight text-fg">{item.label}</span>
+                    <span className="block text-[12px] text-faint">{item.desc}</span>
+                  </span>
+                </Link>
+              ))}
+              <div className="mx-4 h-px bg-line" />
               <button
-                onClick={() => setMore(false)}
-                aria-label="Close"
-                className="rounded-md p-1.5 text-[var(--fg-subtle)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
+                onClick={() => {
+                  setOpen(false);
+                  setPaletteOpen(true);
+                }}
+                className="flex w-full items-center gap-3.5 px-4 py-3 text-left transition-colors active:bg-hover"
               >
-                <X size={16} />
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mist text-fg">
+                  <Search size={18} strokeWidth={1.9} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] font-semibold leading-tight text-fg">Search everything</span>
+                  <span className="block text-[12px] text-faint">Files, subjects, papers</span>
+                </span>
               </button>
-            </div>
-            <div className="space-y-1.5">
-              {MORE.map((item) => {
-                const active = pathname.startsWith(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-3 rounded-xl border px-3 py-3 transition-colors ${
-                      active
-                        ? 'border-[var(--line-strong)] bg-[var(--bg-hover)]'
-                        : 'border-[var(--line)] hover:bg-[var(--bg-hover)]'
-                    }`}
-                  >
-                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--bg-sub)] text-[var(--fg-muted)] ring-1 ring-[var(--line)]">
-                      <item.icon size={16} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[13px] font-medium">{item.label}</span>
-                      <span className="block text-[11px] text-[var(--fg-subtle)]">{item.hint}</span>
-                    </span>
-                  </Link>
-                );
-              })}
+              <div className="h-2" />
             </div>
           </div>
         </div>
       )}
 
-      <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur-md md:hidden"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-      >
-        <div className="mx-auto flex h-14 max-w-lg items-stretch">
-          {ITEMS.map((item) => {
-            const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium transition-colors ${
-                  active ? 'text-[var(--fg)]' : 'text-[var(--fg-subtle)]'
-                }`}
-              >
-                <item.icon size={19} strokeWidth={active ? 2.2 : 1.8} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-          <button
-            onClick={() => setMore(true)}
-            aria-label="More sections"
-            aria-expanded={more}
-            className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-[10.5px] font-medium transition-colors ${
-              mediaActive || more ? 'text-[var(--fg)]' : 'text-[var(--fg-subtle)]'
-            }`}
-          >
-            <Plus size={19} strokeWidth={mediaActive ? 2.2 : 1.8} />
-            <span>More</span>
-          </button>
+      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-elev/92 backdrop-blur-xl md:hidden">
+        <div className="safe-b">
+          <div className="mx-auto flex h-14 max-w-lg items-stretch">
+            {PRIMARY.slice(0, 2).map((item) => (
+              <Tab key={item.href} item={item} pathname={pathname} />
+            ))}
+            {PRIMARY.slice(2).map((item) => (
+              <Tab key={item.href} item={item} pathname={pathname} />
+            ))}
+            <button
+              onClick={() => setOpen(true)}
+              className={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${
+                open ? 'text-fg' : 'text-faint'
+              }`}
+              aria-label="More sections"
+              aria-expanded={open}
+            >
+              <LayoutGrid size={20} strokeWidth={1.85} />
+              <span className="text-[10px] font-semibold leading-none">More</span>
+            </button>
+          </div>
         </div>
       </nav>
     </>
   );
 }
 
-export function MobileTopBar({ title, back }: { title?: string; back?: boolean }) {
+function Tab({
+  item,
+  pathname,
+}: {
+  item: { href: string; label: string; icon: typeof Home };
+  pathname: string;
+}) {
+  const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-[var(--line)] bg-[var(--bg)]/92 px-4 backdrop-blur-md md:hidden">
-      <Link href="/" className="flex shrink-0 items-center gap-2">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="AcademicOS" className="h-7 w-auto" />
-        <span className="font-serif text-[16px] font-bold tracking-tight">
-          Academic<span className="text-[var(--brand)]">OS</span>
-        </span>
-      </Link>
-      {title && <span className="truncate text-[11.5px] text-[var(--fg-subtle)]">{title}</span>}
-      {back && <span className="sr-only">Back</span>}
-    </header>
+    <Link
+      href={item.href}
+      aria-current={active ? 'page' : undefined}
+      className={`relative flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${
+        active ? 'text-fg' : 'text-faint'
+      }`}
+    >
+      <item.icon size={20} strokeWidth={active ? 2.3 : 1.85} className={active ? 'text-accent' : ''} />
+      <span className="text-[10px] font-semibold leading-none">{item.label}</span>
+    </Link>
   );
 }

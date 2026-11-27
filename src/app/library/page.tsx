@@ -5,16 +5,19 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
   ChevronRight,
-  FolderClosed,
+  Folder,
   FolderOpen,
   LayoutGrid,
   ListTree,
   Search,
   SlidersHorizontal,
   X,
+  FileText,
+  Rows3,
 } from 'lucide-react';
 import { useApp } from '@/components/app-provider';
 import { MobileTopBar } from '@/components/mobile-nav';
+import { SyncPill } from '@/components/sync-pill';
 import { FileCard } from '@/components/file-card';
 import { FileTypeIcon } from '@/components/file-icon';
 import { searchCatalog } from '@/lib/search';
@@ -25,16 +28,20 @@ function LibraryInner() {
   const { catalog, loading } = useApp();
   const params = useSearchParams();
   const [view, setView] = useState<'smart' | 'folders'>('smart');
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   const [q, setQ] = useState(params.get('q') || '');
-  const [year, setYear] = useState<string>('All');
-  const [subject, setSubject] = useState<string>('All');
-  const [type, setType] = useState<string>('All');
-  const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({ '': true });
-  const [activeFolder, setActiveFolder] = useState<string>('');
+  const [year, setYear] = useState('All');
+  const [subject, setSubject] = useState('All');
+  const [type, setType] = useState('All');
+  const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
+  const [activeFolder, setActiveFolder] = useState('');
 
   const files = catalog.files;
 
-  const years = useMemo(() => ['All', ...Array.from(new Set(files.map((f) => f.year).filter(Boolean) as string[]))], [files]);
+  const years = useMemo(
+    () => ['All', ...Array.from(new Set(files.map((f) => f.year).filter(Boolean) as string[]))],
+    [files]
+  );
   const subjects = useMemo(
     () => ['All', ...Array.from(new Set(files.map((f) => f.subject).filter(Boolean) as string[])).sort()],
     [files]
@@ -49,7 +56,7 @@ function LibraryInner() {
     if (year !== 'All') list = list.filter((f) => f.year === year);
     if (subject !== 'All') list = list.filter((f) => f.subject === subject);
     if (type !== 'All') list = list.filter((f) => f.type === type);
-    if (q.trim()) list = searchCatalog(list, q, 120);
+    if (q.trim()) list = searchCatalog(list, q, 150);
     return list;
   }, [files, year, subject, type, q]);
 
@@ -62,13 +69,12 @@ function LibraryInner() {
     return counts;
   }, [files]);
 
-  const folderFiles = useMemo(() => {
-    if (!activeFolder) return files;
-    return files.filter((f) => f.path[0] === activeFolder);
-  }, [files, activeFolder]);
+  const folderFiles = useMemo(
+    () => (activeFolder ? files.filter((f) => f.path[0] === activeFolder) : files),
+    [files, activeFolder]
+  );
 
   const activeFilterCount = [year, subject, type].filter((v) => v !== 'All').length;
-
   const clearFilters = () => {
     setYear('All');
     setSubject('All');
@@ -79,76 +85,103 @@ function LibraryInner() {
   return (
     <>
       <MobileTopBar title="Library" />
-      <div className="mx-auto max-w-[1400px] px-4 pb-8 pt-5 sm:px-6 md:pt-7 lg:px-8">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+
+      <div className="mx-auto max-w-[1320px] px-4 pb-10 pt-5 sm:px-6 md:pt-8 lg:px-10">
+        {/* ── Header ────────────────────────────────────────────── */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="label-eyebrow">Library</p>
-            <h1 className="mt-1.5 font-serif text-[25px] font-bold tracking-[-0.02em] sm:text-[29px]">Every resource, two ways to find it.</h1>
-            <p className="mt-1.5 text-[13px] text-[var(--fg-muted)]">
-              Browse the original folder structure, or filter by year, subject and type.
+            <div className="flex items-center gap-2">
+              <h1 className="text-[27px] h-display text-fg sm:text-[32px]">Library</h1>
+              <SyncPill compact />
+            </div>
+            <p className="mt-1.5 max-w-[52ch] text-[13px] leading-relaxed text-muted">
+              Every resource, two ways. Filter by year, subject and type — or browse the
+              original Drive structure.
             </p>
           </div>
-          <div className="flex items-center gap-1 rounded-lg border border-[var(--line)] bg-[var(--bg-sub)] p-0.5">
-            <button
-              onClick={() => setView('smart')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] font-medium transition-colors ${
-                view === 'smart' ? 'bg-[var(--bg-elev)] text-[var(--fg)] shadow-[var(--shadow-card)]' : 'text-[var(--fg-muted)] hover:text-[var(--fg)]'
-              }`}
-            >
-              <SlidersHorizontal size={13} /> Smart
-            </button>
-            <button
-              onClick={() => setView('folders')}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] font-medium transition-colors ${
-                view === 'folders' ? 'bg-[var(--bg-elev)] text-[var(--fg)] shadow-[var(--shadow-card)]' : 'text-[var(--fg-muted)] hover:text-[var(--fg)]'
-              }`}
-            >
-              <ListTree size={13} /> Folders
-            </button>
+
+          <div className="flex items-center gap-1.5">
+            <div className="flex items-center rounded-xl bg-mist p-0.5">
+              <SegBtn active={view === 'smart'} onClick={() => setView('smart')} icon={SlidersHorizontal}>
+                Smart
+              </SegBtn>
+              <SegBtn active={view === 'folders'} onClick={() => setView('folders')} icon={ListTree}>
+                Folders
+              </SegBtn>
+            </div>
+            {view === 'smart' && (
+              <div className="hidden items-center rounded-xl bg-mist p-0.5 sm:flex">
+                <button
+                  onClick={() => setLayout('grid')}
+                  aria-label="Grid"
+                  className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                    layout === 'grid' ? 'bg-elev text-fg shadow-hair' : 'text-faint hover:text-muted'
+                  }`}
+                >
+                  <LayoutGrid size={13} />
+                </button>
+                <button
+                  onClick={() => setLayout('list')}
+                  aria-label="List"
+                  className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                    layout === 'list' ? 'bg-elev text-fg shadow-hair' : 'text-faint hover:text-muted'
+                  }`}
+                >
+                  <Rows3 size={13} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Search */}
-        <div className="mb-4 flex items-center gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--bg-elev)] px-3">
-          <Search size={15} className="text-[var(--fg-subtle)]" />
+        {/* ── Search ────────────────────────────────────────────── */}
+        <div className="mt-5 flex items-center gap-2.5 rounded-2xl bg-elev px-3.5 shadow-lift transition-shadow focus-within:shadow-pop">
+          <Search size={16} strokeWidth={2} className="shrink-0 text-faint" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder={view === 'smart' ? 'Search within filters…' : 'Search all files…'}
-            className="h-10 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-[var(--fg-subtle)]"
+            placeholder={view === 'smart' ? 'Search within filters…' : 'Search every file…'}
+            className="h-12 flex-1 bg-transparent text-[14px] outline-none placeholder:text-faint"
+            aria-label="Search library"
           />
           {q && (
-            <button onClick={() => setQ('')} aria-label="Clear search" className="rounded p-1 text-[var(--fg-subtle)] hover:text-[var(--fg)]">
-              <X size={14} />
+            <button onClick={() => setQ('')} aria-label="Clear" className="rounded-md p-1 text-faint hover:text-fg">
+              <X size={15} />
             </button>
           )}
         </div>
 
         {view === 'smart' ? (
-          <div className="flex flex-col gap-5 lg:flex-row">
-            {/* Filters rail */}
-            <aside className="w-full shrink-0 lg:w-[232px]">
-              <div className="space-y-5 rounded-xl border border-[var(--line)] bg-[var(--bg-elev)] p-3.5">
+          <div className="mt-6 flex flex-col gap-6 lg:flex-row">
+            {/* Filters */}
+            <aside className="w-full shrink-0 lg:w-[226px]">
+              <div className="space-y-5 lg:sticky lg:top-6">
                 {activeFilterCount > 0 && (
-                  <button onClick={clearFilters} className="flex w-full items-center justify-center gap-1 rounded-md border border-[var(--line)] py-1.5 text-[11.5px] text-[var(--fg-muted)] hover:bg-[var(--bg-hover)]">
-                    <X size={12} /> Clear {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''}
+                  <button
+                    onClick={clearFilters}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent-soft py-2 text-[11.5px] font-semibold text-accent transition-colors hover:brightness-95"
+                  >
+                    <X size={12} strokeWidth={2.4} />
+                    Clear {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''}
                   </button>
                 )}
                 <FilterGroup label="Year" options={years} value={year} onChange={setYear} />
-                <FilterGroup label="Resource type" options={types} value={type} onChange={setType} />
+                <FilterGroup label="Type" options={types} value={type} onChange={setType} />
                 <div>
-                  <p className="label-eyebrow mb-2">Subject</p>
-                  <div className="max-h-[240px] space-y-0.5 overflow-y-auto pr-1">
+                  <p className="eyebrow mb-2.5">Subject</p>
+                  <div className="no-scrollbar max-h-[268px] space-y-0.5 overflow-y-auto pr-1">
                     {subjects.map((s) => (
                       <button
                         key={s}
                         onClick={() => setSubject(s)}
-                        className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[12px] transition-colors ${
-                          subject === s ? 'bg-[var(--bg-hover)] font-medium text-[var(--fg)]' : 'text-[var(--fg-muted)] hover:bg-[var(--bg-sub)] hover:text-[var(--fg)]'
+                        className={`flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-[12px] transition-colors ${
+                          subject === s
+                            ? 'bg-fg font-semibold text-canvas'
+                            : 'text-muted hover:bg-hover hover:text-fg'
                         }`}
                       >
                         <span className="truncate">{s}</span>
-                        {subject === s && <ChevronRight size={12} />}
+                        {subject === s && <ChevronRight size={12} className="shrink-0" />}
                       </button>
                     ))}
                   </div>
@@ -158,94 +191,143 @@ function LibraryInner() {
 
             {/* Results */}
             <div className="min-w-0 flex-1">
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-[12.5px] text-[var(--fg-muted)]">
-                  <span className="font-semibold text-[var(--fg)]">{results.length}</span> files
-                  {year !== 'All' && ` · ${year}`}
-                  {subject !== 'All' && ` · ${subject}`}
-                  {type !== 'All' && ` · ${type}`}
-                </p>
+              <div className="mb-3 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+                <span className="tnum text-[13px] font-bold text-fg">{results.length}</span>
+                <span className="text-[12.5px] text-muted">
+                  {results.length === 1 ? 'file' : 'files'}
+                </span>
+                {[year, subject, type].filter((v) => v !== 'All').length > 0 && (
+                  <span className="text-[12px] text-faint">
+                    · {[year, subject, type].filter((v) => v !== 'All').join(' · ')}
+                  </span>
+                )}
               </div>
+
               {loading ? (
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
                   {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} className="h-[126px] rounded-xl border border-[var(--line)] skeleton" />
+                    <div key={i} className="h-[122px] rounded-xl skeleton" />
                   ))}
                 </div>
               ) : results.length === 0 ? (
                 <EmptyState onReset={clearFilters} />
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              ) : layout === 'grid' ? (
+                <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
                   {results.map((f) => (
                     <FileCard key={f.id} file={f} />
+                  ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-line overflow-hidden rounded-2xl bg-elev shadow-card">
+                  {results.map((f) => (
+                    <FileRow key={f.id} file={f} />
                   ))}
                 </div>
               )}
             </div>
           </div>
         ) : (
-          <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
+          <div className="mt-6 grid gap-4 lg:grid-cols-[286px_1fr]">
             {/* Folder tree */}
-            <aside className="rounded-xl border border-[var(--line)] bg-[var(--bg-elev)] p-2.5">
-              <p className="label-eyebrow px-2 pb-2 pt-1">{catalog.rootName}</p>
-              <button
-                onClick={() => setActiveFolder('')}
-                className={`mb-0.5 flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12.5px] transition-colors ${
-                  activeFolder === '' ? 'bg-[var(--bg-hover)] font-medium' : 'text-[var(--fg-muted)] hover:bg-[var(--bg-sub)]'
-                }`}
-              >
-                <FolderOpen size={14} className="text-[var(--fg-subtle)]" /> All materials
-                <span className="ml-auto text-[10.5px] text-[var(--fg-subtle)]">{files.length}</span>
-              </button>
-              {Object.keys(folderCounts).map((folder) => {
-                const open = Boolean(openFolders[folder]);
-                const nested = catalog.folders.filter((f) => f.path[0] === folder && f.path.length > 1);
-                return (
-                  <div key={folder}>
-                    <div className={`flex items-center rounded-md transition-colors ${activeFolder === folder ? 'bg-[var(--bg-hover)]' : 'hover:bg-[var(--bg-sub)]'}`}>
-                      <button
-                        onClick={() => setOpenFolders((o) => ({ ...o, [folder]: !o[folder] }))}
-                        aria-label={open ? 'Collapse' : 'Expand'}
-                        className="p-1 text-[var(--fg-subtle)]"
-                      >
-                        <ChevronRight size={13} className={`transition-transform ${open ? 'rotate-90' : ''}`} />
-                      </button>
-                      <button
-                        onClick={() => setActiveFolder(folder)}
-                        className={`flex min-w-0 flex-1 items-center gap-2 py-1.5 pr-2 text-left text-[12.5px] ${
-                          activeFolder === folder ? 'font-medium text-[var(--fg)]' : 'text-[var(--fg-muted)]'
+            <aside className="self-start overflow-hidden rounded-2xl bg-elev shadow-card lg:sticky lg:top-6">
+              <div className="border-b border-line px-3.5 py-2.5">
+                <p className="flex items-center gap-1.5 text-[11px] font-bold text-fg">
+                  <Folder size={12} className="text-amber-600" />
+                  {catalog.rootName}
+                </p>
+              </div>
+              <div className="p-1.5">
+                <button
+                  onClick={() => setActiveFolder('')}
+                  className={`mb-0.5 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[12.5px] transition-colors ${
+                    activeFolder === ''
+                      ? 'bg-navy-950 font-semibold text-white'
+                      : 'text-muted hover:bg-hover hover:text-fg'
+                  }`}
+                >
+                  <FolderOpen size={14} strokeWidth={2} className="shrink-0" />
+                  All materials
+                  <span
+                    className={`tnum ml-auto text-[10.5px] ${
+                      activeFolder === '' ? 'text-white/50' : 'text-faint'
+                    }`}
+                  >
+                    {files.length}
+                  </span>
+                </button>
+
+                {Object.keys(folderCounts).map((folder) => {
+                  const open = Boolean(openFolders[folder]);
+                  const nested = catalog.folders.filter(
+                    (f) => f.path[0] === folder && f.path.length > 1
+                  );
+                  const isActive = activeFolder === folder;
+                  return (
+                    <div key={folder}>
+                      <div
+                        className={`flex items-center rounded-lg transition-colors ${
+                          isActive ? 'bg-hover' : 'hover:bg-hover'
                         }`}
                       >
-                        {open ? <FolderOpen size={14} className="shrink-0 text-[var(--fg-subtle)]" /> : <FolderClosed size={14} className="shrink-0 text-[var(--fg-subtle)]" />}
-                        <span className="truncate">{folder}</span>
-                        <span className="ml-auto text-[10.5px] text-[var(--fg-subtle)]">{folderCounts[folder]}</span>
-                      </button>
-                    </div>
-                    {open && nested.length > 0 && (
-                      <div className="ml-[26px] border-l border-[var(--line)] pl-2">
-                        {nested.slice(0, 8).map((nf) => (
-                          <p key={nf.id} className="truncate py-1 text-[11.5px] text-[var(--fg-subtle)]">
-                            {nf.path.slice(1).join(' / ')}
-                          </p>
-                        ))}
+                        <button
+                          onClick={() => setOpenFolders((o) => ({ ...o, [folder]: !o[folder] }))}
+                          aria-label={open ? 'Collapse' : 'Expand'}
+                          aria-expanded={open}
+                          className="p-1.5 pl-2 text-faint"
+                        >
+                          <ChevronRight
+                            size={12}
+                            strokeWidth={2.4}
+                            className={`transition-transform duration-200 ${open ? 'rotate-90' : ''}`}
+                          />
+                        </button>
+                        <button
+                          onClick={() => setActiveFolder(folder)}
+                          className={`flex min-w-0 flex-1 items-center gap-2 py-2 pr-2 text-left text-[12.5px] ${
+                            isActive ? 'font-semibold text-fg' : 'text-muted'
+                          }`}
+                        >
+                          {open ? (
+                            <FolderOpen size={14} strokeWidth={2} className="shrink-0 text-amber-600" />
+                          ) : (
+                            <Folder size={14} strokeWidth={2} className="shrink-0 text-amber-600/80" />
+                          )}
+                          <span className="truncate">{folder}</span>
+                          <span className="tnum ml-auto text-[10.5px] text-faint">
+                            {folderCounts[folder]}
+                          </span>
+                        </button>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                      {open && nested.length > 0 && (
+                        <div className="mb-1 ml-[22px] border-l border-line pl-2.5">
+                          {nested.slice(0, 8).map((nf) => (
+                            <p key={nf.id} className="truncate py-0.5 text-[11px] text-faint">
+                              {nf.path.slice(1).join(' / ')}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </aside>
 
             {/* Folder contents */}
             <div className="min-w-0">
               <div className="mb-3 flex flex-wrap items-baseline gap-2">
-                <h2 className="font-serif text-[19px] font-bold tracking-[-0.01em]">{activeFolder || 'All materials'}</h2>
-                <span className="text-[11.5px] text-[var(--fg-subtle)]">{folderFiles.length} files</span>
+                <h2 className="text-[17px] h-title text-fg">{activeFolder || 'All materials'}</h2>
+                <span className="tnum text-[11.5px] text-faint">{folderFiles.length} files</span>
               </div>
-              <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--bg-elev)]">
-                {folderFiles.map((f, i) => (
-                  <FileRow key={f.id} file={f} last={i === folderFiles.length - 1} />
+              <div className="divide-y divide-line overflow-hidden rounded-2xl bg-elev shadow-card">
+                {folderFiles.map((f) => (
+                  <FileRow key={f.id} file={f} />
                 ))}
-                {folderFiles.length === 0 && <p className="px-4 py-10 text-center text-[12.5px] text-[var(--fg-muted)]">No files in this folder.</p>}
+                {folderFiles.length === 0 && (
+                  <p className="px-4 py-14 text-center text-[12.5px] text-muted">
+                    Nothing in this folder yet.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -255,19 +337,53 @@ function LibraryInner() {
   );
 }
 
-function FilterGroup({ label, options, value, onChange }: { label: string; options: string[]; value: string; onChange: (v: string) => void }) {
+function SegBtn({
+  active,
+  onClick,
+  icon: Icon,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: typeof LayoutGrid;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-all ${
+        active ? 'bg-elev text-fg shadow-hair' : 'text-faint hover:text-muted'
+      }`}
+    >
+      <Icon size={13} strokeWidth={2.1} />
+      {children}
+    </button>
+  );
+}
+
+function FilterGroup({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div>
-      <p className="label-eyebrow mb-2">{label}</p>
+      <p className="eyebrow mb-2.5">{label}</p>
       <div className="flex flex-wrap gap-1.5">
         {options.map((o) => (
           <button
             key={o}
             onClick={() => onChange(o)}
-            className={`rounded-md border px-2 py-1 text-[11.5px] font-medium transition-colors ${
+            className={`rounded-lg px-2.5 py-1 text-[11.5px] font-semibold transition-all ${
               value === o
-                ? 'border-[var(--fg)] bg-[var(--fg)] text-[var(--bg)]'
-                : 'border-[var(--line)] text-[var(--fg-muted)] hover:border-[var(--line-strong)] hover:text-[var(--fg)]'
+                ? 'bg-fg text-canvas'
+                : 'bg-elev text-muted shadow-hair hover:text-fg'
             }`}
           >
             {o}
@@ -278,33 +394,47 @@ function FilterGroup({ label, options, value, onChange }: { label: string; optio
   );
 }
 
-function FileRow({ file, last }: { file: CatalogFile; last: boolean }) {
+function FileRow({ file }: { file: CatalogFile }) {
   return (
     <Link
       href={`/viewer/${file.id}`}
-      className={`group flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-[var(--bg-hover)] ${!last ? 'border-b border-[var(--line)]' : ''}`}
+      className="group flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-hover"
     >
       <FileTypeIcon file={file} size={15} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] font-medium">{file.name}</p>
-        <p className="truncate text-[11px] text-[var(--fg-subtle)]">
-          {file.path.join(' / ')} {file.modifiedTime ? `· ${new Date(file.modifiedTime).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}
+        <p className="truncate text-[13px] font-semibold text-fg">
+          {file.name.replace(/\.pdf$/i, '')}
+        </p>
+        <p className="truncate text-[11px] text-faint">
+          {file.path.join(' / ')}
+          {file.modifiedTime
+            ? ` · ${new Date(file.modifiedTime).toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}`
+            : ''}
         </p>
       </div>
-      <span className="hidden shrink-0 text-[11px] text-[var(--fg-subtle)] sm:block">{formatSize(file.size)}</span>
-      <span className="shrink-0 rounded border border-[var(--line)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--fg-muted)]">{file.type}</span>
+      <span className="tnum hidden shrink-0 text-[11px] text-faint sm:block">
+        {formatSize(file.size)}
+      </span>
+      <span className="chip shrink-0">{file.type}</span>
     </Link>
   );
 }
 
 function EmptyState({ onReset }: { onReset: () => void }) {
   return (
-    <div className="rounded-xl border border-dashed border-[var(--line)] px-6 py-16 text-center">
-      <p className="font-serif text-[17px] font-bold">No matches</p>
-      <p className="mx-auto mt-1.5 max-w-sm text-[12.5px] text-[var(--fg-muted)]">
-        Nothing matches this combination of filters. Clear them to see the whole library.
+    <div className="rounded-2xl border border-dashed border-line-strong px-6 py-16 text-center">
+      <span className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-mist">
+        <FileText size={18} className="text-faint" strokeWidth={1.8} />
+      </span>
+      <p className="text-[16px] font-bold text-fg">No matches</p>
+      <p className="mx-auto mt-1.5 max-w-sm text-[12.5px] leading-relaxed text-muted">
+        Nothing fits this combination. Clear the filters to see the whole library.
       </p>
-      <button onClick={onReset} className="btn btn-ghost mt-4 text-[12px]">
+      <button onClick={onReset} className="btn btn-outline btn-sm mt-4">
         Clear filters
       </button>
     </div>
@@ -313,7 +443,19 @@ function EmptyState({ onReset }: { onReset: () => void }) {
 
 export default function LibraryPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-[13px] text-[var(--fg-muted)]">Loading library…</div>}>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-[1320px] px-4 py-8 sm:px-6 lg:px-10">
+          <div className="h-8 w-40 rounded-lg skeleton" />
+          <div className="mt-4 h-12 rounded-2xl skeleton" />
+          <div className="mt-6 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-[122px] rounded-xl skeleton" />
+            ))}
+          </div>
+        </div>
+      }
+    >
       <LibraryInner />
     </Suspense>
   );

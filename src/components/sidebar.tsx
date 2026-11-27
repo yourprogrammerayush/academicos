@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
@@ -13,15 +12,17 @@ import {
   Bookmark,
   Search,
   Settings,
-  ChevronsLeft,
-  ChevronsRight,
-  Plus,
+  PanelLeftClose,
+  PanelLeftOpen,
   Moon,
   Sun,
   Laptop,
+  FileText,
+  Command,
 } from 'lucide-react';
 import { useApp } from './app-provider';
 import { store } from '@/lib/store';
+import { Logo } from './logo';
 
 const NAV = [
   { href: '/', label: 'Home', icon: Home },
@@ -39,7 +40,7 @@ export function Sidebar() {
   const [recents, setRecents] = useState<{ id: string; label: string }[]>([]);
 
   useEffect(() => {
-    setCollapsed(store.getTheme() === 'dark' ? false : localStorage.getItem('academicos:sidebar') === '1');
+    setCollapsed(localStorage.getItem('academicos:sidebar') === '1');
     setRecents(
       store
         .getRecents()
@@ -59,25 +60,19 @@ export function Sidebar() {
 
   return (
     <aside
-      className="sticky top-0 hidden h-screen shrink-0 flex-col border-r border-[var(--line)] bg-[var(--bg-sub)] transition-[width] duration-200 md:flex"
-      style={{ width: collapsed ? 72 : 248 }}
+      className="sticky top-0 hidden h-screen shrink-0 flex-col border-r border-line bg-sunken transition-[width] duration-300 ease-swift md:flex"
+      style={{ width: collapsed ? 76 : 252 }}
     >
-      <div className={`flex h-16 items-center ${collapsed ? 'justify-center' : 'justify-between px-4'}`}>
-        <Link href="/" className="flex items-center gap-2.5 overflow-hidden focus-ring rounded-lg">
-          <Image src="/logo.png" alt="AcademicOS" width={96} height={58} className="h-8 w-auto shrink-0 object-contain" priority />
-          {!collapsed && (
-            <span className="font-serif text-[17px] font-bold leading-none tracking-tight">
-              Academic<span className="text-[var(--brand)]">OS</span>
-            </span>
-          )}
-        </Link>
+      {/* Brand */}
+      <div className={`flex h-[68px] items-center ${collapsed ? 'justify-center' : 'justify-between px-5'}`}>
+        <Logo size={30} withWordmark={!collapsed} />
         {!collapsed && (
           <button
             onClick={toggleCollapsed}
             aria-label="Collapse sidebar"
-            className="rounded-md p-1.5 text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)] focus-ring"
+            className="btn-icon h-7 w-7"
           >
-            <ChevronsLeft size={16} />
+            <PanelLeftClose size={15} strokeWidth={1.9} />
           </button>
         )}
       </div>
@@ -86,30 +81,36 @@ export function Sidebar() {
         <button
           onClick={toggleCollapsed}
           aria-label="Expand sidebar"
-          className="mx-auto mb-2 rounded-md p-1.5 text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)] focus-ring"
+          className="btn-icon mx-auto mb-1 h-7 w-7"
         >
-          <ChevronsRight size={16} />
+          <PanelLeftOpen size={15} strokeWidth={1.9} />
         </button>
       )}
 
-      <div className={collapsed ? 'px-3' : 'px-3'}>
+      {/* Search */}
+      <div className="px-3">
         <button
           onClick={() => setPaletteOpen(true)}
-          className={`flex w-full items-center gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--bg-elev)] py-2 text-[13px] text-[var(--fg-subtle)] transition-colors hover:border-[var(--line-strong)] hover:text-[var(--fg-muted)] focus-ring ${collapsed ? 'justify-center px-0' : 'px-3'}`}
+          className={`flex w-full items-center gap-2.5 rounded-xl bg-elev py-2 text-[13px] text-muted transition-all hover:shadow-lift ${
+            collapsed ? 'justify-center px-0 shadow-hair' : 'px-3 shadow-hair'
+          }`}
           aria-label="Search everything"
         >
-          <Search size={15} />
+          <Search size={15} strokeWidth={2} />
           {!collapsed && (
             <>
-              <span className="flex-1 text-left">Search everything</span>
-              <kbd className="rounded border border-[var(--line)] bg-[var(--bg-sub)] px-1.5 py-0.5 text-[10px] font-medium">⌘K</kbd>
+              <span className="flex-1 text-left">Search</span>
+              <kbd className="flex items-center gap-0.5 rounded-md bg-mist px-1.5 py-0.5 text-[10px] font-semibold text-faint">
+                <Command size={9} strokeWidth={2.5} />K
+              </kbd>
             </>
           )}
         </button>
       </div>
 
-      <nav className={`mt-5 flex flex-1 flex-col gap-0.5 overflow-y-auto no-scrollbar ${collapsed ? 'px-3' : 'px-3'}`}>
-        {!collapsed && <p className="label-eyebrow mb-2 px-3">Workspace</p>}
+      {/* Nav */}
+      <nav className="mt-6 flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 no-scrollbar">
+        {!collapsed && <p className="eyebrow mb-2 px-3">Library</p>}
         {NAV.map((item) => {
           const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
           return (
@@ -117,79 +118,85 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               title={collapsed ? item.label : undefined}
-              className={`group flex items-center gap-2.5 rounded-lg py-2 text-[13.5px] font-medium transition-colors focus-ring ${
+              aria-current={active ? 'page' : undefined}
+              className={`group relative flex items-center gap-3 rounded-xl py-[9px] text-[13.5px] font-medium transition-colors ${
                 collapsed ? 'justify-center px-0' : 'px-3'
               } ${
                 active
-                  ? 'bg-[var(--bg-elev)] text-[var(--fg)] shadow-[var(--shadow-card)] ring-1 ring-[var(--line)]'
-                  : 'text-[var(--fg-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]'
+                  ? 'bg-elev text-fg shadow-hair font-semibold'
+                  : 'text-muted hover:bg-hover hover:text-fg'
               }`}
             >
-              <item.icon size={17} strokeWidth={active ? 2.1 : 1.8} className={active ? 'text-[var(--brand)]' : ''} />
+              {active && (
+                <span className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-accent" />
+              )}
+              <item.icon
+                size={17}
+                strokeWidth={active ? 2.15 : 1.85}
+                className={active ? 'text-accent' : 'text-faint group-hover:text-muted'}
+              />
               {!collapsed && <span className="flex-1">{item.label}</span>}
             </Link>
           );
         })}
 
         {!collapsed && recents.length > 0 && (
-          <div className="mt-6">
-            <p className="label-eyebrow mb-2 px-3">Recent</p>
+          <div className="mt-7">
+            <p className="eyebrow mb-2 px-3">Recently opened</p>
             {recents.map((r) => (
               <Link
                 key={r.id}
                 href={`/viewer/${r.id}`}
-                className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[12.5px] text-[var(--fg-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:bg-hover hover:text-fg"
               >
-                <span className="h-1 w-1 rounded-full bg-[var(--fg-subtle)]" />
-                <span className="truncate" title={r.label}>{r.label}</span>
+                <FileText size={13} strokeWidth={1.8} className="shrink-0 text-faint" />
+                <span className="truncate" title={r.label}>
+                  {r.label}
+                </span>
               </Link>
             ))}
           </div>
         )}
       </nav>
 
-      <div className={`border-t border-[var(--line)] p-3 ${collapsed ? 'space-y-2' : 'space-y-1.5'}`}>
+      {/* Account + utilities */}
+      <div className={`border-t border-line p-3 ${collapsed ? 'space-y-2' : 'space-y-1'}`}>
         {!collapsed && (
           <button
             onClick={() => setAuthOpen(true)}
-            className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[var(--bg-hover)]"
+            className="flex w-full items-center gap-2.5 rounded-xl px-2 py-2 text-left transition-colors hover:bg-hover"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--fg)] text-[11px] font-semibold text-[var(--bg)]">
-              {(signedIn ? userName : 'G').slice(0, 1).toUpperCase()}
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-navy-950 text-[11px] font-bold text-white">
+              {(signedIn ? userName : 'A').slice(0, 1).toUpperCase()}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[12.5px] font-medium">{signedIn ? userName : 'Guest mode'}</span>
-              <span className="block truncate text-[11px] text-[var(--fg-subtle)]">
-                {signedIn ? 'Synced profile' : 'Sign in to sync'}
+              <span className="block truncate text-[12.5px] font-semibold leading-tight">
+                {signedIn ? userName : 'Ayush Jha'}
               </span>
+              <span className="block truncate text-[11px] text-faint">2CSE-4 · Guest</span>
             </span>
-            <Plus size={14} className="text-[var(--fg-subtle)]" />
           </button>
         )}
         {collapsed && (
           <button
             onClick={() => setAuthOpen(true)}
             aria-label="Account"
-            className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fg)] text-[11px] font-semibold text-[var(--bg)]"
+            className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-navy-950 text-[11px] font-bold text-white"
           >
-            {(signedIn ? userName : 'G').slice(0, 1).toUpperCase()}
+            {(signedIn ? userName : 'A').slice(0, 1).toUpperCase()}
           </button>
         )}
-        <div className={`flex items-center gap-1 ${collapsed ? 'flex-col' : 'justify-between'}`}>
+        <div className={`flex items-center gap-1 ${collapsed ? 'flex-col' : 'justify-between'} px-1`}>
           <button
             onClick={() => setTheme(theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light')}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[11.5px] text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg-muted)]"
+            className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 text-[11.5px] text-faint transition-colors hover:bg-hover hover:text-muted"
             title={`Theme: ${theme}`}
           >
-            <ThemeIcon size={14} />
+            <ThemeIcon size={14} strokeWidth={1.9} />
             {!collapsed && <span className="capitalize">{theme}</span>}
           </button>
-          <Link
-            href="/settings"
-            aria-label="Settings"
-            className="rounded-md p-1.5 text-[var(--fg-subtle)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--fg)]"
-          >
-            <Settings size={15} />
+          <Link href="/settings" aria-label="Settings" className="btn-icon h-7 w-7">
+            <Settings size={15} strokeWidth={1.9} />
           </Link>
         </div>
       </div>

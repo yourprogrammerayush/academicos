@@ -15,13 +15,13 @@ export function InstallBanner() {
   if (!canInstall || dismissed || !installPrompt) return null;
 
   return (
-    <div className="fixed inset-x-3 bottom-[4.75rem] z-30 mx-auto max-w-md rounded-xl border border-[var(--line)] bg-[var(--bg-elev)] p-3 shadow-[var(--shadow-pop)] md:left-auto md:right-4 md:bottom-4 md:mx-0">
+    <div className="fixed inset-x-3 bottom-[4.75rem] z-30 mx-auto max-w-md rounded-xl border border-line bg-elev p-3 shadow-pop md:left-auto md:right-4 md:bottom-4 md:mx-0">
       <div className="flex items-start gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/icon-192.png" alt="" className="h-10 w-10 rounded-lg border border-[var(--line)]" />
+        <img src="/icons/icon-192.png" alt="" className="h-10 w-10 rounded-lg border border-line" />
         <div className="min-w-0 flex-1">
           <p className="text-[12.5px] font-semibold">Install AcademicOS</p>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--fg-muted)]">
+          <p className="mt-0.5 text-[11px] leading-relaxed text-muted">
             Full-screen app, offline shell, instant launch — on desktop and mobile.
           </p>
           <div className="mt-2 flex gap-2">
@@ -45,7 +45,7 @@ export function InstallBanner() {
             setDismissed(true);
             localStorage.setItem('academicos:install-dismissed', '1');
           }}
-          className="rounded p-1 text-[var(--fg-subtle)] hover:text-[var(--fg)]"
+          className="rounded p-1 text-faint hover:text-fg"
         >
           <X size={13} />
         </button>

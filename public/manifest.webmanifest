@@ -1,19 +1,42 @@
 {
-  "name": "AcademicOS",
+  "name": "AcademicOS — Study Library",
   "short_name": "AcademicOS",
-  "description": "AI-powered academic workspace for your study materials.",
+  "description": "Every study material for your degree — read, watch, listen, and ask AI. Works offline.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait-primary",
   "background_color": "#FFFFFF",
-  "theme_color": "#0F1B2D",
+  "theme_color": "#FFFFFF",
   "categories": ["education", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+    { "src": "/brand/mark-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/mark-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/brand/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Library",
+      "short_name": "Library",
+      "url": "/library",
+      "description": "Browse every subject and paper"
+    },
+    {
+      "name": "Ask AI",
+      "short_name": "AI",
+      "url": "/ai",
+      "description": "Ask questions about your material"
+    },
+    {
+      "name": "Podcasts",
+      "short_name": "Audio",
+      "url": "/audio",
+      "description": "Listen to lecture audio"
+    }
   ]
 }
