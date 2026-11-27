@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ hasKey: false, ok: false });
+    return NextResponse.json({ hasKey: false, ok: false }, { headers: { 'Cache-Control': 'no-store' } });
   }
 
   const results: Record<string, unknown>[] = [];
@@ -45,5 +45,5 @@ export async function GET() {
     keyLength: apiKey.length,
     keyPrefix: apiKey.slice(0, 4),
     models: results,
-  });
+  }, { headers: { 'Cache-Control': 'no-store' } });
 }
