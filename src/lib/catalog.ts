@@ -81,7 +81,7 @@ export function typeFromName(name: string, kind: FileKind, path: string[] = []):
   if (kind === 'audio') return 'Audio';
   if (kind === 'image') return 'Image';
   if (/syllabus|curriculum|scheme/.test(hay)) return 'Syllabus';
-  if (/pyq|previous year|question bank|\bqb\b|question paper|past paper|exam paper|\bqp\b|\bete\b|\bmid ?term\b|\bend ?term\b|\bend ?sem\b/.test(hay)) return 'PYQ';
+  if (/pyq|previous year|question bank|\bqb\b|\bpaper\b|past paper|exam paper|\bqp\b|\bqp\b|\bete\b|\bmid ?term\b|\bend ?term\b|\bend ?sem\b/.test(hay)) return 'PYQ';
   if (/assignment|lab record|practical|lab manual|tutorial|solution/.test(hay)) return 'Assignment';
   if (/\.pptx?|presentation|slides|seminar/.test(hay)) return 'Presentation';
   if (/notes|handwritten|lecture|chapter|unit|module|material|guide|handbook|calendar|notice/.test(hay))
