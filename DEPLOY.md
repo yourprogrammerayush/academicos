@@ -48,7 +48,7 @@ worker) → `next build`. Expect roughly 1–2 minutes.
 
 ## Step 2 — Your URL
 
-Production alias: **https://academic-os.vercel.app**
+Production alias: **https://academic-os-eight-rust.vercel.app**
 
 Deployment-specific URLs look like
 `academic-os-<hash>-ayushjhaayush2006-3880s-projects.vercel.app`.
