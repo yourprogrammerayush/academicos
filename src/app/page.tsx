@@ -82,6 +82,18 @@ export default function HomePage() {
     [files]
   );
 
+  const examReady = useMemo(() => {
+    const bySubject = new Map<string, { papers: number; notes: number }>();
+    for (const f of files) {
+      if (!f.subject) continue;
+      const entry = bySubject.get(f.subject) ?? { papers: 0, notes: 0 };
+      if (f.type === 'PYQ') entry.papers += 1;
+      if (f.type === 'Notes') entry.notes += 1;
+      bySubject.set(f.subject, entry);
+    }
+    return Array.from(bySubject.values()).filter((v) => v.papers > 0 && v.notes > 0).length;
+  }, [files]);
+
   const latest = useMemo(
     () =>
       [...files]
@@ -170,6 +182,30 @@ export default function HomePage() {
           <QuickTile href="/video" label="Video lectures" meta={`${stats.videos} clips`} icon={Film} />
           <QuickTile href="/audio" label="Podcasts" meta={`${stats.audio} tracks`} icon={Headphones} />
         </section>
+
+        {/* ── Exam readiness ─────────────────────────────────────── */}
+        {examReady > 0 && (
+          <Link
+            href="/exams"
+            className="group mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-navy-950 px-4 py-3.5 shadow-lift transition-shadow hover:shadow-pop"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10">
+              <GraduationCap size={16} className="text-amber-400" strokeWidth={2} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13px] font-semibold text-white">
+                {examReady} subjects are exam ready
+              </span>
+              <span className="mt-0.5 block text-[11.5px] text-white/55">
+                Notes, past papers and solutions already lined up in revision order
+              </span>
+            </span>
+            <span className="flex items-center gap-1 text-[11.5px] font-semibold text-amber-400">
+              Open kits
+              <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+        )}
 
         {/* ── Continue ───────────────────────────────────────────── */}
         {continueList.length > 0 && (
