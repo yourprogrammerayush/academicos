@@ -1,31 +1,84 @@
-# AcademicOS — go-live checklist
+# Vercel deployment — exact steps
 
-The repository `yourprogrammerayush/academicos` is on `main` and building cleanly.
-The Vercel project `academic-os` already exists and holds these environment variables:
-GOOGLE_DRIVE_ROOT_FOLDER_ID, GROQ_MODEL_PRIMARY, GROQ_MODEL_FAST, NEXT_PUBLIC_APP_URL.
+## Why it failed automatically
 
-## Why the automated deploy stopped
+Vercel returned:
 
-Vercel's API refuses git deployments for this account until a **GitHub Login Connection**
-is attached to the Vercel account ("You need to add a Login Connection to your GitHub
-account first"), and the deploy endpoint additionally returned a GitHub API rate limit.
-The Vercel connector in this session can create projects and env vars but cannot attach
-that GitHub login or upload a project archive, so the final connect step is one click.
+```
+ready_state: ERROR
+errorCode:   git_info_fail
+reason:      "Git information retrieval failed for this deployment."
+```
 
-## One click
+The Vercel account has **no GitHub Login Connection**. Without it, Vercel cannot read
+`yourprogrammerayush/academicos`, so every git deployment dies before the build starts.
+Creating that connection is a browser login — it cannot be done through the API.
 
-1. Open https://vercel.com/new and import `yourprogrammerayush/academicos`.
-2. Project name: `academic-os` (already created — choose "link existing project").
-3. Framework preset: Next.js. Build command and output: leave defaults.
-4. Deploy.
+Everything else is already done:
 
-Production URL will be https://academic-os.vercel.app
+- GitHub repo `academicos` is public, `main` is current
+- Vercel project `academic-os` exists (`prj_18mYwfGUDYVJBfUuVmQEUR6SZhtt`)
+- Env vars already set: `GOOGLE_DRIVE_ROOT_FOLDER_ID`, `GROQ_MODEL_PRIMARY`,
+  `GROQ_MODEL_FAST`, `NEXT_PUBLIC_APP_URL`
 
-## Optional keys (both have graceful fallbacks)
+---
 
-| Key | Effect when set |
+## Step 1 — Connect GitHub (the part only you can do)
+
+Option A, fastest:
+
+1. Open the failed deployment:
+   https://vercel.com/ayushjhaayush2006-3880s-projects/academic-os
+2. Click **Connect Git Repository** (or **Settings → Git → Connect Git Repository**).
+3. Authorise Vercel on GitHub if prompted → choose **yourprogrammerayush/academicos**.
+4. Vercel redeploys automatically.
+
+Option B, if you prefer importing fresh:
+
+1. Go to https://vercel.com/new
+2. **Import Git Repository** → `yourprogrammerayush/academicos`
+3. When it asks for the project, pick the existing **academic-os**
+4. Framework preset is auto-detected as **Next.js** — leave build/install/output blank
+5. **Deploy**
+
+The build runs `npm install` → `npm run assets` (restores fonts/icons, copies the pdf.js
+worker) → `next build`. Expect roughly 1–2 minutes.
+
+---
+
+## Step 2 — Your URL
+
+Production alias: **https://academic-os.vercel.app**
+
+Deployment-specific URLs look like
+`academic-os-<hash>-ayushjhaayush2006-3880s-projects.vercel.app`.
+
+Quick check once it is live:
+
+| Path | Expected |
 | --- | --- |
-| `GROQ_API_KEY` | Turns Study AI and the in-viewer study tools from the local search fallback into live streaming gpt-oss answers |
-| `GOOGLE_DRIVE_API_KEY` | Switches the catalog from the curated 67-file snapshot to a live re-index and serves media through the official Files API |
+| `/` | Home with 67 files, "MATERIALS BY AYUSH JHA, 2CSE-4" |
+| `/api/health` | JSON, `integrations.groq` and `.drive` both false until keys are added |
+| `/api/catalog` | `mode: "curated"`, `files: 67` |
+| `/manifest.webmanifest` | PWA manifest, installable |
 
-Add them under Project → Settings → Environment Variables, then redeploy.
+---
+
+## Step 3 — Optional keys (each has a fallback)
+
+| Key | Where to get it | What changes |
+| --- | --- | --- |
+| `GROQ_API_KEY` | https://console.groq.com/keys (free) | Study AI switches from local search to streaming `openai/gpt-oss-120b`, plus in-viewer summary/formula/practice tools |
+| `GOOGLE_DRIVE_API_KEY` | Google Cloud Console → enable Drive API → API key | Catalog re-indexes the folder live instead of the curated 67-file snapshot, and media streams through the official Files API |
+
+Add them at **Project → Settings → Environment Variables**, tick all three environments,
+then **Redeploy**. Paste `GROQ_API_KEY` into chat instead if you want me to wire it and
+verify the live URL for you.
+
+---
+
+## Notes
+
+- If Drive streaming returns 424 in production, the file is not link-shared.
+  Set `GOOGLE_DRIVE_API_KEY`, or share the folder as "Anyone with the link – Viewer".
+- Once the GitHub connection exists, every push to `main` deploys automatically.
