@@ -1,5 +1,7 @@
 # Vercel deployment — exact steps
 
+> Setting up Google Drive live sync? See [`DRIVE_KEY_SETUP.md`](./DRIVE_KEY_SETUP.md).
+
 ## Why it failed automatically
 
 Vercel returned:

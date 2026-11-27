@@ -35,6 +35,8 @@ fast, installable academic workspace.
 | **Live sync** | A stale-while-revalidate Drive cache: uploads to the master folder show up without a reload, and a sync chip says whether the catalogue is live or a snapshot |
 | **PWA** | Installable on desktop + mobile, offline app shell, self-hosted variable font & icons precached |
 
+> Want live Drive sync? Follow [`DRIVE_KEY_SETUP.md`](./DRIVE_KEY_SETUP.md) — five minutes, one key.
+
 ## Stack
 
 - **Next.js 15** App Router · **TypeScript** · **Tailwind CSS**
