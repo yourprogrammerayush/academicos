@@ -3,7 +3,7 @@ import './globals.css';
 import { AppShell } from '@/components/app-shell';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://academic-os-eight-rust.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://academicos-app.vercel.app'),
   title: {
     default: 'AcademicOS — Every study material in one place',
     template: '%s · AcademicOS',

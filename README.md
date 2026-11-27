@@ -11,7 +11,7 @@ without ever leaving the app. Google Drive stores the files; AcademicOS makes th
 
 `Web App Created By - Ayush Jha, 2CSE-4`
 
-**Live: [academic-os-eight-rust.vercel.app](https://academic-os-eight-rust.vercel.app)**
+**Live: [academicos-app.vercel.app](https://academicos-app.vercel.app)**
 
 </div>
 

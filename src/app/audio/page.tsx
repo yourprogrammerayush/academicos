@@ -33,7 +33,7 @@ const SLEEP_CHOICES = [5, 10, 15, 30, 45] as const;
  * to move between tracks, matching the video feed.
  */
 export default function AudioPage() {
-  const { catalog, play: _play } = useApp();
+  const { catalog } = useApp();
   const { isFav, toggle } = useFavorites();
   const tracks = useMemo(() => catalog.files.filter((f) => f.kind === 'audio'), [catalog.files]);
 
@@ -50,6 +50,10 @@ export default function AudioPage() {
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const current = tracks[index];
+
+  useEffect(() => {
+    if (index > tracks.length - 1) setIndex(0);
+  }, [tracks.length, index]);
 
   /* Playback rate */
   useEffect(() => {
@@ -193,7 +197,13 @@ export default function AudioPage() {
               <ArrowLeft size={19} strokeWidth={2.1} />
             </Link>
             <div className="min-w-0 flex-1 text-center">
-              <p className="eyebrow">Now listening</p>
+              <p className="truncate text-[12.5px] font-bold text-fg">
+                {playing ? 'Now playing' : 'Podcasts'}
+              </p>
+              <p className="text-[10px] text-faint">
+                {tracks.length} track{tracks.length === 1 ? '' : 's'} ·{' '}
+                {index + 1} of {tracks.length}
+              </p>
             </div>
             <button onClick={() => setQueueOpen(true)} aria-label="Queue" className="btn-icon -mr-1">
               <ListMusic size={19} strokeWidth={1.9} />
@@ -414,6 +424,44 @@ export default function AudioPage() {
 
                 {i < tracks.length - 1 && (
                   <p className="mt-4 text-center text-[10.5px] text-faint">Scroll to keep listening</p>
+                )}
+
+                {/* Up next */}
+                {tracks.length > 1 && (
+                  <div className="mt-7">
+                    <p className="eyebrow mb-2">Up next</p>
+                    <div className="divide-y divide-line overflow-hidden rounded-2xl bg-elev shadow-card">
+                      {tracks
+                        .slice(i + 1)
+                        .concat(tracks.slice(0, i))
+                        .slice(0, 3)
+                        .map((t) => {
+                          const realIdx = tracks.findIndex((x) => x.id === t.id);
+                          return (
+                            <button
+                              key={t.id}
+                              onClick={() => {
+                                goTo(realIdx);
+                                goToScroll(realIdx);
+                              }}
+                              className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-hover"
+                            >
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-mist text-faint">
+                                <Play size={11} fill="currentColor" />
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-[12px] font-semibold text-fg">
+                                  {t.name.replace(/\.[a-z0-9]+$/i, '')}
+                                </span>
+                                <span className="block truncate text-[10.5px] text-faint">
+                                  {[t.subject, t.semester].filter(Boolean).join(' · ') || t.type}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
                 )}
               </div>
             </section>
