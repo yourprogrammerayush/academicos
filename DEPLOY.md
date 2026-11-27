@@ -68,12 +68,16 @@ Quick check once it is live:
 
 | Key | Where to get it | What changes |
 | --- | --- | --- |
-| `GROQ_API_KEY` | https://console.groq.com/keys (free) | Study AI switches from local search to streaming `openai/gpt-oss-120b`, plus in-viewer summary/formula/practice tools |
+| `GROQ_API_KEY` | ✅ **configured** | Study AI streams from `openai/gpt-oss-120b` with `gpt-oss-20b` fallback |
 | `GOOGLE_DRIVE_API_KEY` | Google Cloud Console → enable Drive API → API key | Catalog re-indexes the folder live instead of the curated 67-file snapshot, and media streams through the official Files API |
 
-Add them at **Project → Settings → Environment Variables**, tick all three environments,
-then **Redeploy**. Paste `GROQ_API_KEY` into chat instead if you want me to wire it and
-verify the live URL for you.
+`GROQ_API_KEY` is set as a **sensitive** variable: encrypted at rest, write-only, and
+never readable back through the API or dashboard. Verified live — both models returned
+HTTP 200 on deployment `dpl_9Yn3me3mT7XwFwtewoqABrBK9owP`. `/api/health` reports
+`"groq": true`.
+
+`GOOGLE_DRIVE_API_KEY` is still unset, so the catalog uses the curated 67-file snapshot
+and media streams via the direct-download URL.
 
 ---
 
