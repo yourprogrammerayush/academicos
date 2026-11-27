@@ -27,11 +27,13 @@ fast, installable academic workspace.
 | **Smart Library** | Dual navigation — the original Drive folder tree *and* a parsed Year → Semester → Subject → Type organiser |
 | **In-app viewer** | PDF reader (zoom, page jump, fullscreen, night reading), text/markdown reader, image viewer, document fallback |
 | **Video** | Reels-style vertical feed with a one-tap landscape *Lecture Mode*, speed 0.75×–2×, playlist |
-| **Audio** | Podcast-grade player with waveform scrubber, ±15 s jumps, sleep timer, persistent mini-player |
-| **Study AI** | Groq-backed chat (English · हिंदी · Hinglish · 日本語) grounded on the indexed catalog, streaming Markdown + LaTeX |
+| **Audio** | Full-screen audiobook player: album art, scrubber, queue, sleep timer, 0.75×–2× speed, scroll between tracks |
+| **Exam kits** | Per-subject revision order assembled from the files that exist — syllabus, notes, lecture, past paper, solutions, question bank — with a coverage score and an explicit gap note |
+| **Study AI** | Groq-backed chat (English · हिंदी · Hinglish · 日本語) grounded on the whole indexed catalogue, streaming Markdown + LaTeX |
 | **Smart search** | `⌘K` / `Ctrl K` palette with fuzzy, abbreviation-aware matching (COA, DCN, DECO, OOP…) |
 | **Workspace** | Favorites, custom collections, recents, downloads and search history — local-first, zero DB cost |
-| **PWA** | Installable on desktop + mobile, offline app shell, custom font & icons precached |
+| **Live sync** | A stale-while-revalidate Drive cache: uploads to the master folder show up without a reload, and a sync chip says whether the catalogue is live or a snapshot |
+| **PWA** | Installable on desktop + mobile, offline app shell, self-hosted variable font & icons precached |
 
 ## Stack
 
