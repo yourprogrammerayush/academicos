@@ -7,57 +7,50 @@ type Props = {
   withWordmark?: boolean;
   href?: string | null;
   className?: string;
-  priority?: boolean;
+  lockup?: boolean;
 };
 
 /**
- * Brand lockup: the graduation-cap mark next to a typographic wordmark.
- * The mark is the supplied artwork (transparent PNG); the wordmark is set in
- * Jakarta so it stays crisp at every size and inherits theme colour.
+ * Brand lockup.
+ *
+ * Default: the supplied artwork's own lockup — graduation cap over the
+ * "AcademicOS" wordmark — as one transparent PNG. Because it is the original
+ * artwork rather than recomposed text, the wordmark's navy/amber/coral
+ * gradient is exactly the supplied one.
+ *
+ * `withWordmark={false}` falls back to the mark alone for tight spaces.
+ * Every variant is transparent, so it sits correctly on the white canvas.
  */
-export function Logo({ size = 32, withWordmark = true, href = '/', className = '' }: Props) {
-  const body = (
-    <span className={`inline-flex select-none items-center gap-2.5 ${className}`}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/brand/logo-mark.png"
-        alt="AcademicOS"
-        width={size}
-        height={size}
-        className="shrink-0"
-        style={{ width: size, height: size }}
-        draggable={false}
-      />
-      {withWordmark && (
-        <span
-          className="h-title text-[1.0625rem] leading-none"
-          style={{ letterSpacing: '-0.038em' }}
-          aria-hidden="true"
-        >
-          <span className="text-fg">Academic</span>
-          <span
-            style={{
-              background: 'linear-gradient(94deg, #FCA800 0%, #FC6000 52%, #FC3A2C 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent',
-            }}
-          >
-            OS
-          </span>
-        </span>
-      )}
-    </span>
+export function Logo({
+  size = 32,
+  withWordmark = true,
+  href = '/',
+  className = '',
+}: Props) {
+  const body = withWordmark ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/brand/logo-lockup.png"
+      alt="AcademicOS"
+      width={Math.round(size * 1.16)}
+      height={size}
+      className={`brand-lockup shrink-0 ${className}`}
+      style={{ height: size, width: 'auto' }}
+      draggable={false}
+    />
+  ) : (
+    <LogoMarkOnly size={size} className={className} />
   );
 
   if (!href) return body;
   return (
-    <Link href={href} className="inline-flex rounded-lg" aria-label="AcademicOS home">
+    <Link href={href} className="inline-flex items-center rounded-lg" aria-label="AcademicOS home">
       {body}
     </Link>
   );
 }
 
+/** The graduation-cap mark alone — the app icon silhouette. */
 export function LogoMarkOnly({ size = 28, className = '' }: { size?: number; className?: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -66,7 +59,7 @@ export function LogoMarkOnly({ size = 28, className = '' }: { size?: number; cla
       alt=""
       width={size}
       height={size}
-      className={className}
+      className={`brand-mark shrink-0 ${className}`}
       style={{ width: size, height: size }}
       draggable={false}
     />

@@ -44,10 +44,12 @@ export default function AboutPage() {
       <div className="mx-auto max-w-[880px] px-4 pb-14 pt-6 sm:px-6 lg:px-8">
         {/* Brand */}
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-          <div className="flex h-[74px] w-[74px] shrink-0 items-center justify-center rounded-2xl bg-navy-950 shadow-pop">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/mark-192.png" alt="" width={54} height={54} className="h-[54px] w-[54px]" />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/logo-full.png"
+            alt="AcademicOS"
+            className="h-[104px] w-auto shrink-0"
+          />
           <div className="min-w-0">
             <h1 className="text-[27px] h-display text-fg sm:text-[33px]">
               An operating system for your degree.

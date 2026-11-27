@@ -74,7 +74,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [driveConnected, setDriveConnected] = useState(false);
   const [sync, setSync] = useState<SyncState>({ mode: 'curated', syncedAt: null, syncing: false, notice: null });
   const [query, setQuery] = useState('');
-  const [theme, setThemeState] = useState<Theme>('system');
+  const [theme, setThemeState] = useState<Theme>('light');
   const [player, setPlayer] = useState<PlayerState>({ file: null, playing: false });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);

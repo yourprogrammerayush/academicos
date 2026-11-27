@@ -2,17 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Variable fonts, self-hosted (no network, no FOUT) ─────────────── */
 @font-face {
+  /* Plus Jakarta Sans (variable) — self-hosted, zero network dependency */
   font-family: 'Jakarta';
-  src: url('/fonts/var/plus-jakarta-sans-latin.woff2') format('woff2-variations');
+  src: url('/fonts/var/plus-jakarta-sans-latin.woff2') format('woff2 supports variations'),
+       url('/fonts/var/plus-jakarta-sans-latin.woff2') format('woff2-variations'),
+       url('/fonts/var/plus-jakarta-sans-latin.woff2') format('woff2');
   font-weight: 200 800;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
+  /* Inter (variable) — secondary face for dense UI and numerals */
   font-family: 'InterVar';
-  src: url('/fonts/var/inter-latin.woff2') format('woff2-variations');
+  src: url('/fonts/var/inter-latin.woff2') format('woff2 supports variations'),
+       url('/fonts/var/inter-latin.woff2') format('woff2-variations'),
+       url('/fonts/var/inter-latin.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;

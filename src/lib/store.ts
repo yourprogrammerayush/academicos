@@ -76,7 +76,7 @@ export const store = {
   },
   getChatThreads: () => read<ChatThread[]>(LS.chatThreads, []),
   setChatThreads: (t: ChatThread[]) => write(LS.chatThreads, t),
-  getTheme: () => read<'light' | 'dark' | 'system'>(LS.theme, 'system'),
+  getTheme: () => read<'light' | 'dark' | 'system'>(LS.theme, 'light'),
   setTheme: (t: 'light' | 'dark' | 'system') => write(LS.theme, t),
   getProfile: () => read<{ name: string; email: string; guest: boolean }>(LS.profile, { name: 'Guest', email: '', guest: true }),
   setProfile: (p: { name: string; email: string; guest: boolean }) => write(LS.profile, p),

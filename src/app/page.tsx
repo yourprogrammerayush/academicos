@@ -15,6 +15,7 @@ import {
   Play,
   FileText,
   GraduationCap,
+  LayoutGrid,
   Command,
   Flame,
 } from 'lucide-react';
@@ -22,6 +23,7 @@ import { useApp } from '@/components/app-provider';
 import { MobileTopBar } from '@/components/mobile-nav';
 import { SyncPill } from '@/components/sync-pill';
 import { FileCard } from '@/components/file-card';
+import { ArtTile } from '@/components/art-tile';
 import { FileTypeIcon } from '@/components/file-icon';
 import { searchCatalog } from '@/lib/search';
 import { store } from '@/lib/store';
@@ -170,17 +172,52 @@ export default function HomePage() {
         </section>
 
         {/* ── Quick access tiles ─────────────────────────────────── */}
-        <section className="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-          <QuickTile
-            href="/ai"
-            label="Ask Study AI"
-            meta="Grounded in your files"
-            icon={Sparkle}
-            tone="accent"
-          />
-          <QuickTile href="/exams" label="Exam kits" meta="Revision order" icon={GraduationCap} />
-          <QuickTile href="/video" label="Video lectures" meta={`${stats.videos} clips`} icon={Film} />
-          <QuickTile href="/audio" label="Podcasts" meta={`${stats.audio} tracks`} icon={Headphones} />
+        <section className="mt-7">
+          <h2 className="mb-2.5 text-[14px] font-bold tracking-[-0.015em] text-fg">
+            New updates
+          </h2>
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+            <ArtTile
+              kind="ai"
+              href="/ai"
+              label="Study AI"
+              meta="Ask anything"
+              icon={Sparkle}
+            />
+            <ArtTile
+              kind="library"
+              href="/library"
+              label="Library"
+              meta={`${stats.total} files`}
+              icon={LayoutGrid}
+            />
+            <ArtTile
+              kind="exams"
+              href="/exams"
+              label="Exam kits"
+              meta={
+                examReady > 0 ? `${examReady} ready` : 'Revision order'
+              }
+              icon={GraduationCap}
+            />
+            <ArtTile
+              kind="video"
+              href="/video"
+              label="Lectures"
+              meta={`${stats.videos} videos`}
+              icon={Film}
+            />
+          </div>
+          <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-1">
+            <ArtTile
+              kind="audio"
+              href="/audio"
+              label="Podcasts & audio guides"
+              meta={`${stats.audio} track${stats.audio === 1 ? '' : 's'} · listen while you revise`}
+              icon={Headphones}
+              featured
+            />
+          </div>
         </section>
 
         {/* ── Exam readiness ─────────────────────────────────────── */}

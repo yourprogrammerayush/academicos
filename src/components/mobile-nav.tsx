@@ -48,7 +48,7 @@ export function MobileTopBar({
             {title ? (
               <p className="truncate text-[14.5px] font-semibold tracking-[-0.02em] text-fg">{title}</p>
             ) : (
-              <Logo size={0} withWordmark />
+              <Logo size={26} withWordmark href={null} />
             )}
           </div>
           {right}

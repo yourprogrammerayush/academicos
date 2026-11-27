@@ -40,7 +40,7 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
-const themeInit = `(function(){try{var t=JSON.parse(localStorage.getItem('academicos:theme')||'"system"');var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;if(d){r.classList.add('dark');}r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
+const themeInit = `(function(){try{var t=JSON.parse(localStorage.getItem('academicos:theme')||'"light"');var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;if(d){r.classList.add('dark');}r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

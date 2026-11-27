@@ -82,13 +82,8 @@ export function AuthModal() {
 
         <div className="px-6 pt-7">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy-950">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand/mark-96.png" alt="" width={26} height={26} className="h-[26px] w-[26px]" />
-            </span>
-            <span className="text-[17px] font-bold tracking-[-0.02em] text-fg">
-              Academic<span className="text-accent">OS</span>
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/logo-lockup.png" alt="AcademicOS" className="h-9 w-auto" />
           </div>
         </div>
 
