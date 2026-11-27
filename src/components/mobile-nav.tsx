@@ -41,14 +41,12 @@ export function MobileTopBar({
             >
               <ChevronLeft size={19} strokeWidth={2.1} />
             </Link>
-          ) : (
-            <Logo size={26} withWordmark={false} href={null} />
-          )}
+          ) : null}
           <div className="min-w-0 flex-1">
             {title ? (
               <p className="truncate text-[14.5px] font-semibold tracking-[-0.02em] text-fg">{title}</p>
             ) : (
-              <Logo size={26} withWordmark href={null} />
+              <Logo size={28} withWordmark href={null} />
             )}
           </div>
           {right}
