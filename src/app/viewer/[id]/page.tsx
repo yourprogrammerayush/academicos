@@ -181,9 +181,12 @@ export default function ViewerPage() {
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
           <FileTypeIcon file={file} size={14} />
           <div className="min-w-0">
-            <p className="truncate text-[12.5px] font-medium leading-tight">{file.name}</p>
+            <p className="truncate text-[12.5px] font-semibold leading-tight text-fg">
+              {file.name.replace(/\.pdf$/i, '')}
+            </p>
             <p className="hidden truncate text-[10.5px] text-faint sm:block">
-              {file.path.join(' / ')} {numPages ? `· ${numPages} pages` : ''}
+              {file.subject || file.path.join(' / ')}
+              {numPages ? ` · ${numPages} pages` : ''}
             </p>
           </div>
         </div>
@@ -222,9 +225,11 @@ export default function ViewerPage() {
           </IconBtn>
           <button
             onClick={() => setAiOpen((o) => !o)}
-            className="ml-1 hidden items-center gap-1.5 rounded-lg bg-fg px-2.5 py-1.5 text-[11.5px] font-medium text-canvas transition-opacity hover:opacity-90 sm:flex"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-fg px-2.5 py-1.5 text-[11.5px] font-semibold text-canvas transition-opacity hover:opacity-90"
+            aria-label="Study AI"
           >
-            <Sparkle size={13} /> Study AI
+            <Sparkle size={13} strokeWidth={2.2} />
+            <span className="hidden sm:inline">Study AI</span>
           </button>
         </div>
       </header>
@@ -251,9 +256,14 @@ export default function ViewerPage() {
           )}
 
           {isAudio && (
-            <div className="flex h-full flex-col items-center justify-center gap-6 bg-sunken px-6">
-              <div className="flex h-36 w-36 items-center justify-center rounded-2xl bg-[#0F1B2D] ring-1 ring-white/10">
-                <div className="flex items-end gap-[3px]">
+            <div className="flex h-full flex-col items-center justify-center gap-7 bg-sunken px-6">
+              <div className="relative flex h-[184px] w-[184px] items-center justify-center overflow-hidden rounded-[28px] bg-navy-950 shadow-pop">
+                <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full opacity-25" aria-hidden="true">
+                  <circle cx="100" cy="100" r="76" fill="none" stroke="#FCA800" strokeWidth="1.2" />
+                  <circle cx="100" cy="100" r="56" fill="none" stroke="#FC6000" strokeWidth="0.9" />
+                  <circle cx="100" cy="100" r="36" fill="none" stroke="#FC3A2C" strokeWidth="0.7" />
+                </svg>
+                <div className="relative flex items-end gap-[3px]">
                   {[18, 30, 44, 26, 38, 52, 22, 34, 46, 20].map((h, i) => (
                     <span key={i} className="w-[3px] rounded-full bg-white/70" style={{ height: h }} />
                   ))}
@@ -261,12 +271,16 @@ export default function ViewerPage() {
               </div>
               <div className="text-center">
                 <p className="eyebrow">Audio guide</p>
-                <p className="mt-1.5 max-w-md text-[17px] font-bold h-title leading-snug">{file.name}</p>
-                <p className="mt-1 text-[11.5px] text-faint">{[file.subject, file.semester].filter(Boolean).join(' · ')}</p>
+                <p className="mt-2 max-w-md text-[17px] font-bold leading-snug tracking-[-0.02em] text-fg text-balance">
+                  {file.name.replace(/\.(mp3|m4a|wav|ogg)$/i, '')}
+                </p>
+                <p className="mt-1.5 text-[11.5px] text-faint">
+                  {[file.subject, file.semester].filter(Boolean).join(' · ')}
+                </p>
               </div>
               <audio src={src} controls className="w-full max-w-[420px]" />
-              <Link href="/audio" className="text-[11.5px] text-muted underline-offset-2 hover:underline">
-                Open full podcast player →
+              <Link href="/audio" className="btn btn-ghost btn-sm">
+                Open the podcast player <ChevronRight size={13} />
               </Link>
             </div>
           )}

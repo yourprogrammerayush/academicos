@@ -49,95 +49,135 @@ export default function SettingsPage() {
   return (
     <>
       <MobileTopBar title="Settings" />
-      <div className="mx-auto max-w-[760px] px-4 pb-10 pt-5 sm:px-6 md:pt-7 lg:px-8">
-        <p className="eyebrow">Settings</p>
-        <h1 className="mt-1.5 text-[25px] font-bold h-title tracking-[-0.02em] sm:text-[29px]">Preferences.</h1>
-        <p className="mt-1.5 text-[13px] text-muted">Everything here is stored on your device.</p>
+      <div className="mx-auto max-w-[740px] px-4 pb-12 pt-5 sm:px-6 md:pt-8 lg:px-8">
+        <h1 className="text-[27px] h-display text-fg sm:text-[32px]">Settings</h1>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+          Everything here is stored on this device.
+        </p>
 
         <Section title="Appearance">
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'light' as const, label: 'Light', icon: Sun },
-              { id: 'dark' as const, label: 'Dark', icon: Moon },
-              { id: 'system' as const, label: 'System', icon: Laptop },
-            ].map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTheme(t.id)}
-                className={`flex flex-col items-start gap-2 rounded-lg border p-3 transition-colors ${
-                  theme === t.id ? 'border-fg bg-sunken' : 'border-line hover:bg-hover'
-                }`}
-              >
-                <t.icon size={16} className={theme === t.id ? 'text-accent' : 'text-faint'} />
-                <span className="text-[12.5px] font-medium">{t.label}</span>
-                <span className="text-[10px] text-faint">
-                  {t.id === 'light' ? 'Airy, high contrast' : t.id === 'dark' ? 'Slate, not pitch black' : 'Follows your OS'}
-                </span>
-              </button>
-            ))}
+              { id: 'light' as const, label: 'Light', icon: Sun, meta: 'Airy, high contrast' },
+              { id: 'dark' as const, label: 'Dark', icon: Moon, meta: 'Slate, easy at night' },
+              { id: 'system' as const, label: 'System', icon: Laptop, meta: 'Follows your OS' },
+            ].map((t) => {
+              const active = theme === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTheme(t.id)}
+                  aria-pressed={active}
+                  className={`flex flex-col items-start gap-2 rounded-xl p-3 text-left transition-all ${
+                    active
+                      ? 'bg-elev shadow-lift ring-2 ring-inset ring-accent'
+                      : 'bg-elev shadow-hair hover:shadow-card'
+                  }`}
+                >
+                  <t.icon size={16} className={active ? 'text-accent' : 'text-faint'} strokeWidth={2} />
+                  <span className="text-[12.5px] font-semibold text-fg">{t.label}</span>
+                  <span className="text-[10.5px] leading-snug text-faint">{t.meta}</span>
+                </button>
+              );
+            })}
           </div>
         </Section>
 
         <Section title="Account">
           {signedIn ? (
-            <div className="flex items-center gap-3 rounded-lg border border-line bg-elev p-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-fg text-[13px] font-semibold text-canvas">
+            <div className="flex items-center gap-3 rounded-xl bg-elev p-3.5 shadow-card">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fg text-[13px] font-bold text-canvas">
                 {userName.slice(0, 1).toUpperCase()}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-medium">{userName}</p>
-                <p className="text-[11px] text-faint">Signed in · profile sync enabled</p>
+                <p className="truncate text-[13px] font-semibold text-fg">{userName}</p>
+                <p className="text-[11px] text-faint">Signed in · profile sync on</p>
               </div>
-              <button onClick={signOut} className="inline-flex items-center gap-1.5 rounded-md border border-line px-2 py-1 text-[11.5px] text-muted hover:bg-hover">
+              <button onClick={signOut} className="btn btn-outline btn-sm">
                 <LogOut size={12} /> Sign out
               </button>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-elev p-3.5">
-              <div>
-                <p className="text-[13px] font-medium">Guest mode</p>
-                <p className="mt-0.5 text-[11.5px] text-muted">Everything works. Sign-in adds cross-device profile sync.</p>
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-elev p-4 shadow-card">
+              <div className="min-w-0">
+                <p className="text-[13px] font-semibold text-fg">You&apos;re browsing as a guest</p>
+                <p className="mt-0.5 text-[11.5px] leading-relaxed text-muted">
+                  Everything works. Signing in adds a synced profile.
+                </p>
               </div>
-              <button onClick={() => setAuthOpen(true)} className="btn btn-primary text-[12px]">Sign in</button>
+              <button onClick={() => setAuthOpen(true)} className="btn btn-primary btn-sm">
+                Sign in
+              </button>
             </div>
           )}
         </Section>
 
-        <Section title="Install app">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-elev p-3.5">
-            <div className="flex items-start gap-2.5">
-              <Smartphone size={15} className="mt-0.5 shrink-0 text-faint" />
-              <div>
-                <p className="text-[13px] font-medium">AcademicOS on your home screen</p>
-                <p className="mt-0.5 max-w-[380px] text-[11.5px] leading-relaxed text-muted">
-                  One tap on Android/desktop. On iPhone: Share → Add to Home Screen. Runs full-screen with the app shell cached.
+        <Section title="Install">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-elev p-3.5 shadow-card">
+            <div className="flex min-w-0 items-start gap-2.5">
+              <Smartphone size={15} className="mt-0.5 shrink-0 text-faint" strokeWidth={1.9} />
+              <div className="min-w-0">
+                <p className="text-[13px] font-semibold text-fg">Add to your home screen</p>
+                <p className="mt-0.5 max-w-[44ch] text-[11.5px] leading-relaxed text-muted">
+                  One tap on Android and desktop. On iPhone: Share → Add to Home Screen. Runs
+                  full-screen with the shell cached.
                 </p>
               </div>
             </div>
             {canInstall && installPrompt ? (
-              <button onClick={installPrompt} className="btn btn-primary text-[12px]"><Download size={13} /> Install</button>
+              <button onClick={installPrompt} className="btn btn-primary btn-sm">
+                <Download size={13} /> Install
+              </button>
             ) : (
-              <span className="rounded-md border border-line px-2 py-1 text-[10.5px] text-faint">
-                {standalone ? 'Already installed' : 'Use browser menu → Install'}
-              </span>
+              <span className="chip">{standalone ? 'Installed' : 'Via browser menu'}</span>
             )}
           </div>
         </Section>
 
         <Section title="Data & privacy">
-          <div className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-elev">
-            <Row icon={<Database size={14} />} title="Your data stays local" meta="Favorites, collections & history live in this browser only." />
-            <Row icon={<ShieldCheck size={14} />} title="No secrets in the client" meta="All AI and Drive calls are proxied server-side with env-var keys." />
+          <div className="divide-y divide-line overflow-hidden rounded-xl bg-elev shadow-card">
+            <Row
+              icon={<Database size={14} />}
+              title="Your data stays local"
+              meta="Favourites, collections and history live in this browser only."
+            />
+            <Row
+              icon={<ShieldCheck size={14} />}
+              title="No secrets in the client"
+              meta="AI and Drive calls are proxied server-side with secret env vars."
+            />
             <Row
               icon={<Server size={14} />}
-              title="Catalog source"
-              meta={driveConnected ? `Live from Google Drive · ${catalog.files.length} files indexed` : `Demo catalog · ${catalog.files.length} sample files (Drive not connected)`}
+              title="Catalogue source"
+              meta={
+                driveConnected
+                  ? `Live from Google Drive · ${catalog.files.length} files indexed`
+                  : `Curated snapshot · ${catalog.files.length} files (Drive key not set)`
+              }
+              trailing={
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                    driveConnected ? 'bg-ok-soft text-ok' : 'bg-warn-soft text-warn'
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                  {driveConnected ? 'live' : 'snapshot'}
+                </span>
+              }
             />
-            <button onClick={clearLocal} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left transition-colors hover:bg-hover">
-              <Trash2 size={14} className="text-warn" />
+            <button
+              onClick={clearLocal}
+              className="flex w-full items-center gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-hover"
+            >
+              <Trash2 size={14} className={cleared ? 'text-ok' : 'text-warn'} />
               <span className="flex-1">
-                <span className="block text-[12.5px] font-medium">{cleared ? 'Cleared' : 'Clear local workspace data'}</span>
-                <span className="block text-[11px] text-faint">{collectionCount} collections · resets favorites and history</span>
+                <span className="block text-[12.5px] font-semibold text-fg">
+                  {cleared ? 'Cleared' : 'Clear local workspace data'}
+                </span>
+                <span className="block text-[11px] text-faint">
+                  {collectionCount} collection{collectionCount === 1 ? '' : 's'} · resets favourites
+                  and history
+                </span>
               </span>
               {cleared && <Check size={14} className="text-ok" />}
             </button>
@@ -145,22 +185,25 @@ export default function SettingsPage() {
         </Section>
 
         <Section title="More">
-          <div className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-elev">
+          <div className="divide-y divide-line overflow-hidden rounded-xl bg-elev shadow-card">
             <Link href="/about" className="flex items-center gap-2.5 px-3.5 py-3 transition-colors hover:bg-hover">
-              <span className="flex-1 text-[12.5px]">About AcademicOS</span>
+              <span className="flex-1 text-[12.5px] font-medium text-fg">About AcademicOS</span>
               <ChevronRight size={14} className="text-faint" />
             </Link>
             <a href="/api/health" className="flex items-center gap-2.5 px-3.5 py-3 transition-colors hover:bg-hover">
-              <span className="flex-1 text-[12.5px]">System status</span>
+              <span className="flex-1 text-[12.5px] font-medium text-fg">System status</span>
               <span className="inline-flex items-center gap-1.5 text-[10.5px] text-faint">
                 <span className={`h-1.5 w-1.5 rounded-full ${driveConnected ? 'bg-ok' : 'bg-warn'}`} />
-                {driveConnected ? 'Drive live' : 'Demo mode'}
+                {driveConnected ? 'Drive live' : 'Snapshot'}
               </span>
+              <ChevronRight size={14} className="text-faint" />
             </a>
           </div>
         </Section>
 
-        <p className="mt-8 text-center text-[10.5px] text-faint">Web App Created By - Ayush Jha, 2CSE-4</p>
+        <p className="mt-10 text-center text-[10.5px] text-faint">
+          Web App Created By — Ayush Jha, 2CSE-4
+        </p>
       </div>
     </>
   );
@@ -168,21 +211,32 @@ export default function SettingsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="mt-6">
-      <p className="eyebrow mb-2">{title}</p>
+    <section className="mt-7">
+      <p className="eyebrow mb-2.5">{title}</p>
       {children}
     </section>
   );
 }
 
-function Row({ icon, title, meta }: { icon: React.ReactNode; title: string; meta: string }) {
+function Row({
+  icon,
+  title,
+  meta,
+  trailing,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  meta: string;
+  trailing?: React.ReactNode;
+}) {
   return (
-    <div className="flex items-start gap-2.5 px-3.5 py-2.5">
+    <div className="flex items-start gap-2.5 px-3.5 py-3">
       <span className="mt-0.5 text-faint">{icon}</span>
-      <div>
-        <p className="text-[12.5px] font-medium">{title}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-[12.5px] font-semibold text-fg">{title}</p>
         <p className="mt-0.5 text-[11px] leading-relaxed text-faint">{meta}</p>
       </div>
+      {trailing}
     </div>
   );
 }

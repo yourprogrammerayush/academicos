@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   Bookmark,
+  FolderOpen,
+  Layers,
   FolderPlus,
   Clock3,
   Download,
@@ -83,11 +85,10 @@ export default function WorkspacePage() {
       <div className="mx-auto max-w-[1360px] px-4 pb-8 pt-5 sm:px-6 md:pt-7 lg:px-8">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="eyebrow">Workspace</p>
-            <h1 className="mt-1.5 text-[25px] font-bold h-title tracking-[-0.02em] sm:text-[29px]">Your personal study space.</h1>
-            <p className="mt-1.5 max-w-[560px] text-[13px] text-muted">
-              Saved locally on this device — instant, private, zero cost.
-              {!signedIn && ' Sign in to keep it across devices.'}
+            <h1 className="text-[27px] h-display text-fg sm:text-[32px]">Workspace</h1>
+            <p className="mt-1.5 max-w-[56ch] text-[13px] leading-relaxed text-muted">
+              Your saved files and collections, kept on this device — instant and private.
+              {!signedIn && ' Sign in to carry them across devices.'}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -96,38 +97,40 @@ export default function WorkspacePage() {
                 <Check size={13} /> Sync this workspace
               </button>
             )}
-            <button onClick={() => setCreating(true)} className="btn btn-primary text-[12px]">
-              <Plus size={13} /> New collection
+            <button onClick={() => setCreating(true)} className="btn btn-primary btn-sm">
+              <Plus size={13} strokeWidth={2.4} /> New collection
             </button>
           </div>
         </div>
 
         {/* Overview strip */}
         <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-          <Stat label="Favorite files" value={favorites.length} />
-          <Stat label="Collections" value={collections.length} />
-          <Stat label="Recent viewed" value={recents.length} />
-          <Stat label="Total saved" value={totalSaved} />
+          <Stat label="Favourites" value={favorites.length} icon={Bookmark} />
+          <Stat label="Collections" value={collections.length} icon={FolderOpen} />
+          <Stat label="Recently viewed" value={recents.length} icon={Clock3} />
+          <Stat label="Total saved" value={totalSaved} icon={Layers} />
         </div>
 
         {/* Tabs */}
-        <div className="no-scrollbar mb-4 flex gap-1 overflow-x-auto border-b border-line">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => {
-                setTab(t.id);
-                setOpenCollection(null);
-              }}
-              className={`relative flex items-center gap-1.5 whitespace-nowrap px-3 py-2.5 text-[12.5px] font-medium transition-colors ${
-                tab === t.id ? 'text-fg' : 'text-muted hover:text-fg'
-              }`}
-            >
-              <t.icon size={13} />
-              {t.label}
-              {tab === t.id && <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-fg" />}
-            </button>
-          ))}
+        <div className="no-scrollbar mb-4 flex gap-1.5 overflow-x-auto pb-1">
+          {TABS.map((t) => {
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => {
+                  setTab(t.id);
+                  setOpenCollection(null);
+                }}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-all ${
+                  active ? 'bg-fg text-canvas shadow-card' : 'bg-elev text-muted shadow-hair hover:text-fg'
+                }`}
+              >
+                <t.icon size={13} strokeWidth={2.1} />
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {tab === 'favorites' && (
@@ -266,7 +269,7 @@ export default function WorkspacePage() {
               className="mt-3 h-10 w-full rounded-lg border border-line bg-sunken px-3 text-[13px] outline-none focus:border-line-strong"
             />
             <div className="mt-3 flex justify-end gap-2">
-              <button onClick={() => setCreating(false)} className="btn btn-quiet text-[12px]">Cancel</button>
+              <button onClick={() => setCreating(false)} className="btn btn-ghost text-[12px]">Cancel</button>
               <button onClick={createCollection} disabled={!newName.trim()} className="btn btn-primary text-[12px] disabled:opacity-40">Create</button>
             </div>
           </div>
@@ -276,22 +279,41 @@ export default function WorkspacePage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: number;
+  icon: typeof Bookmark;
+}) {
   return (
-    <div className="rounded-lg border border-line bg-elev px-3 py-2.5">
-      <p className="text-[20px] font-bold h-title leading-none tracking-[-0.02em] tabular-nums">{value}</p>
-      <p className="mt-1 text-[10.5px] uppercase tracking-wide text-faint">{label}</p>
+    <div className="rounded-xl bg-elev px-3.5 py-3 shadow-card">
+      <span className="flex items-center justify-between">
+        <p className="tnum text-[23px] font-bold leading-none tracking-[-0.03em] text-fg">{value}</p>
+        <Icon size={13} className="text-faint" strokeWidth={2} />
+      </span>
+      <p className="mt-2 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-faint">
+        {label}
+      </p>
     </div>
   );
 }
 
 function Empty({ icon, title, text, cta }: { icon: React.ReactNode; title: string; text: string; cta?: { href: string; label: string } }) {
   return (
-    <div className="rounded-xl border border-dashed border-line px-6 py-14 text-center">
-      <span className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-sunken text-faint">{icon}</span>
-      <p className="text-[16px] font-bold h-title">{title}</p>
-      <p className="mx-auto mt-1.5 max-w-sm text-[12.5px] text-muted">{text}</p>
-      {cta && <Link href={cta.href} className="btn btn-ghost mt-4 text-[12px]">{cta.label}</Link>}
+    <div className="rounded-2xl border border-dashed border-line-strong px-6 py-14 text-center">
+      <span className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-mist text-faint">
+        {icon}
+      </span>
+      <p className="text-[16px] font-bold text-fg">{title}</p>
+      <p className="mx-auto mt-1.5 max-w-sm text-[12.5px] leading-relaxed text-muted">{text}</p>
+      {cta && (
+        <Link href={cta.href} className="btn btn-outline btn-sm mt-4">
+          {cta.label}
+        </Link>
+      )}
     </div>
   );
 }

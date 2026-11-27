@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { X, Mail, Lock, User, ArrowRight, ShieldCheck, Loader2, Check } from 'lucide-react';
 import { useApp } from './app-provider';
 
@@ -66,8 +65,13 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center px-4 py-8">
-      <div className="absolute inset-0 bg-[#0B1220]/50 backdrop-blur-[3px]" onClick={close} />
-      <div className="animate-fade-up relative w-full max-w-[430px] overflow-hidden rounded-2xl border border-line bg-elev shadow-pop">
+      <button
+        className="absolute inset-0 animate-fade-in bg-navy-950/50 backdrop-blur-[3px]"
+        onClick={close}
+        aria-label="Close sign in"
+        tabIndex={-1}
+      />
+      <div className="relative w-full max-w-[430px] animate-fade-up overflow-hidden rounded-2xl bg-elev shadow-pop">
         <button
           onClick={close}
           aria-label="Close"
@@ -78,8 +82,11 @@ export function AuthModal() {
 
         <div className="px-6 pt-7">
           <div className="flex items-center gap-2.5">
-            <Image src="/logo.png" alt="AcademicOS" width={80} height={48} className="h-7 w-auto" />
-            <span className="text-[17px] font-bold h-title tracking-tight">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy-950">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/mark-96.png" alt="" width={26} height={26} className="h-[26px] w-[26px]" />
+            </span>
+            <span className="text-[17px] font-bold tracking-[-0.02em] text-fg">
               Academic<span className="text-accent">OS</span>
             </span>
           </div>
@@ -100,11 +107,11 @@ export function AuthModal() {
             <button onClick={signOut} className="btn btn-ghost mt-4 w-full justify-center">
               Sign out
             </button>
-            <p className="mt-5 text-center text-[10.5px] text-faint">Web App Created By - Ayush Jha, 2CSE-4</p>
+            <p className="mt-5 text-center text-[10.5px] text-faint">Web App Created By — Ayush Jha, 2CSE-4</p>
           </div>
         ) : (
           <div className="px-6 pb-6 pt-4">
-            <h2 className="text-[19px] font-semibold tracking-[-0.01em]">
+            <h2 className="text-[19px] font-bold tracking-[-0.02em] text-fg">
               {mode === 'signup' ? 'Create your account' : mode === 'otp' ? 'Sign in with a code' : 'Welcome back'}
             </h2>
             <p className="mt-1 text-[12.5px] text-muted">
@@ -193,7 +200,7 @@ export function AuthModal() {
 
               {error && <p className="text-[11.5px] text-warn">{error}</p>}
 
-              <button type="submit" disabled={loading} className="btn btn-brand mt-1 w-full justify-center py-2.5">
+              <button type="submit" disabled={loading} className="btn btn-primary mt-1 w-full justify-center py-2.5">
                 {loading ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (

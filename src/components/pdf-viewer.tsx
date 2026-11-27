@@ -129,45 +129,45 @@ export function PdfViewer({ url, nightMode, zoom, onPagesReady, page, onPageChan
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-auto bg-sunken p-4">
+      <div className="relative flex-1 overflow-auto bg-sunken p-4 sm:p-6">
         <div className="mx-auto flex min-h-full items-start justify-center">
           {rendering && !error && (
-            <div className="absolute flex items-center gap-2 rounded-lg border border-line bg-elev px-3 py-2 text-[11.5px] text-muted shadow-card">
+            <div className="sticky top-2 z-10 -mb-10 flex w-fit items-center gap-2 rounded-full bg-elev px-3 py-1.5 text-[11.5px] text-muted shadow-lift">
               <Loader2 size={13} className="animate-spin" /> Rendering page…
             </div>
           )}
           <canvas
             ref={canvasRef}
-            className={`mx-auto rounded-sm bg-white shadow-[0_2px_16px_rgba(15,27,45,0.14)] transition-[filter] ${nightMode ? 'pdf-night' : ''}`}
+            className={`mx-auto h-auto max-w-full rounded-md bg-white shadow-[0_1px_2px_rgba(11,18,32,0.06),0_12px_32px_-8px_rgba(11,18,32,0.18)] transition-[filter] ${nightMode ? 'pdf-night' : ''}`}
             style={{ transform: `scale(${zoom})`, transformOrigin: 'top center' }}
           />
         </div>
       </div>
       {numPages > 1 && (
-        <div className="flex items-center justify-center gap-3 border-t border-line bg-elev px-4 py-2">
+        <div className="flex items-center justify-center gap-2 border-t border-line bg-elev px-4 py-2 safe-b">
           <button
             onClick={() => onPageChange(Math.max(1, page - 1))}
             disabled={page <= 1}
-            className="rounded-md p-1.5 text-muted transition-colors hover:bg-hover disabled:opacity-30"
+            className="btn-icon h-8 w-8 disabled:opacity-30"
             aria-label="Previous page"
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-[11.5px] tabular-nums text-muted">
+          <span className="tnum text-[11.5px] text-muted">
             Page <input
               type="number"
               value={page}
               min={1}
               max={numPages}
               onChange={(e) => onPageChange(Math.min(numPages, Math.max(1, Number(e.target.value) || 1)))}
-              className="mx-1 w-10 rounded border border-line bg-canvas px-1 py-0.5 text-center text-[11.5px] outline-none focus:border-line-strong"
+              className="mx-1 w-11 rounded-md bg-mist px-1 py-1 text-center text-[11.5px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
               aria-label="Page number"
             /> of {numPages}
           </span>
           <button
             onClick={() => onPageChange(Math.min(numPages, page + 1))}
             disabled={page >= numPages}
-            className="rounded-md p-1.5 text-muted transition-colors hover:bg-hover disabled:opacity-30"
+            className="btn-icon h-8 w-8 disabled:opacity-30"
             aria-label="Next page"
           >
             <ChevronRight size={16} />

@@ -323,6 +323,11 @@ body {
   }
 }
 
+/* Night reading for the PDF canvas — inverts luminance without hue shift */
+.pdf-night {
+  filter: invert(0.9) hue-rotate(180deg) contrast(0.92);
+}
+
 /* KaTeX inherits surrounding text colour */
 .katex {
   color: inherit;
